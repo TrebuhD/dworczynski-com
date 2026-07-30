@@ -94,11 +94,11 @@
   }
 
   body {
-    /* Explicit, not transparent: when Safari finds no usable fixed element it falls back
-       to the body colour, and a transparent body left the bottom toolbar on its default
-       light material even in dark mode. Same value as html, so nothing changes visually -
-       the body box is only 34rem wide, so a different colour here would show. */
-    background-color: var(--bg);
+    /* Must stay transparent. body is a block-level in-flow descendant, so its background
+       paints above the z-index -2 canvas - an opaque body covers the plate across the
+       whole text column. Safari's body-colour fallback is not available to us because of
+       this, whatever the toolbar does. */
+    background: transparent;
     overscroll-behavior-y: none;
     color: var(--fg);
     font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;

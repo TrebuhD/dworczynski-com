@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hubert Dworczyński</title>
+<meta name="description" content="Hubert Dworczyński - Poznań, Poland.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='monospace'>D</text></svg>">
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --fg: #1a1a1a;
+    --dim: #7a7670;
+    --rule: #e0ddd7;
+    --accent: #1a1a1a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14140f;
+      --fg: #e8e5de;
+      --dim: #86817a;
+      --rule: #2c2b26;
+      --accent: #e8e5de;
+    }
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    margin: 0;
+    padding: 14vh 7vw 4rem;
+    max-width: 34rem;
+  }
+
+  h1 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+
+  .tagline {
+    color: var(--dim);
+    margin: 0.35rem 0 0;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li { margin-bottom: 0.4rem; }
+
+  .label {
+    color: var(--dim);
+    display: inline-block;
+    min-width: 6.5rem;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1px;
+  }
+
+  a:hover { border-bottom-color: var(--accent); }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  @media (max-width: 30rem) {
+    body { padding-top: 9vh; }
+    .label { display: block; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Hubert Dworczyński</h1>
+<p class="tagline">Poznań, Poland.</p>
+
+<hr>
+
+<ul>
+  <li><span class="label">github</span><a href="https://github.com/TrebuhD" rel="me">TrebuhD</a></li>
+  <li><span class="label">linkedin</span><a href="https://www.linkedin.com/in/hubert-dworczynski/" rel="me">hubert-dworczynski</a></li>
+  <li><span class="label">email</span><a id="mail" href="#">hubert at dworczynski.com</a></li>
+</ul>
+
+<script>
+  // Assembled at runtime so the address isn't sitting in the HTML for scrapers.
+  (function () {
+    var a = document.getElementById('mail');
+    var addr = ['hubert', 'dworczynski.com'].join('@');
+    a.href = 'mailto:' + addr;
+    a.textContent = addr;
+  })();
+</script>
+
+</body>
+</html>

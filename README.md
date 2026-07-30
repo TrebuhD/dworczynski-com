@@ -59,30 +59,71 @@ SPF records fails SPF entirely.
   `canvas` is a replaced element, so with `width: auto` the box takes its *intrinsic* size
   - the backing-store `width` attribute - and the `right` offset is ignored. Left as
   `left/right: 0` it stretched to the backing width and overflowed the page sideways, which
-  then fed back into the JS resize loop. Verified in Chromium at a 390px viewport.
-- `body` carries `min-height: 100lvh` to match the plate. The plate is absolutely
-  positioned and so still contributes scrollable overflow; without the matching
-  `min-height` the document is content-height and the plate adds a toolbar-height of empty
-  scroll to the bottom of a short page. Verified: vertical overflow is 0 either way now.
+  then fed back into the JS resize loop.
+- `body` carries `min-height: 100svh`, and the plate and grain are `100svh` too. `svh` is
+  the height with the iOS toolbars showing; `lvh` is the retracted height, and using it
+  forces exactly one toolbar-height of empty scroll onto a short page. Since the page is
+  then not scrollable, the toolbars never retract and `svh` stays the full visible area.
 - `overscroll-behavior-y: contain` kills pull-to-refresh but leaves the iOS rubber band
   alone. `none` killed the bounce too and made scrolling feel dead.
 
-### Unresolved: the iOS status bar and toolbar
+## The iOS bars
 
-Solid bars still appear above and below the plate on iOS Safari, where other sites show
-page content. **The cause is not established** - the notes previously here asserted a
-mechanism (`position: fixed` near a viewport edge makes Safari abandon compositing and
-paint a flat tint) that was never confirmed, and flip-flopping the plate between `fixed`
-and `absolute` did not fix it either way. Treat that claim as unverified.
+The status bar and tab bar show a flat colour, not the plate. This is deliberate, after
+testing the alternatives on-device. Two separate mechanisms, established by bisecting on a
+real iPhone (iOS 26.5.2):
 
-What is known:
+**1. The layout viewport is inset, unconditionally.** Safari 26 sets `obscuredContentInsets`
+on its web view, which shrinks the layout viewport to sit inside the chrome - 695px of a
+852px screen on an iPhone 16 Pro. `viewport-fit=cover` does not affect this; it governs
+*display-cutout* insetting, not *browser-UI* insetting. Consequently
+`env(safe-area-inset-top)` is **0 in portrait, and that is correct** - the viewport is
+already a clean rectangle below the Dynamic Island. It only goes non-zero in landscape or
+in home-screen standalone mode. A bare page with nothing but a viewport meta fails to reach
+those bands, so no page-level markup fixes it.
+([WebKit, Safari 26.0 release notes](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/))
 
-- `theme-color` is gone. It definitely does hardcode the bar tint on iOS, so it had to go
-  before anything else could be tested, but removing it alone did not fix the bars.
-- `viewport-fit=cover` is set, so the layout viewport does span the safe areas.
-- None of this reproduces in Chromium, which is the only engine testable here. It needs a
-  real device, and ideally a screenshot plus the iOS version to tell a chrome tint apart
-  from a safe-area gap.
+**2. Bar tint is sampled from the page's `background-color`.** Safari 26 ignores
+`theme-color` entirely. It samples background colours near the viewport edges, falling back
+to `body`. Confirmed on-device: an opaque orange `body` turned both bars orange, and a
+transparent `body` left them system black.
+
+**This is why `body` must be opaque and the plate must not use a negative `z-index`.** The
+plate used to sit at `z-index: -2`, which forced `body { background: transparent }` -
+otherwise the body background painted over it. A transparent body gave Safari nothing to
+sample, so the bars fell back to black against a near-black page. That was the "solid bars"
+bug. The fix is the current stacking: plate `0`, grain `1`, `main` `2`, and an opaque
+`body`. The bars now match `var(--bg)`.
+
+The plate's mean tone measured over ten minutes of drift is `#161611` against the `#14140f`
+background - 2/255 apart - so flat bars at `var(--bg)` are very close to the plate's average
+anyway.
+
+### Rejected: getting the actual sim behind the bars
+
+It is achievable, but only by making the page scroll. Safari composites pixels that have
+scrolled *past* the viewport edge behind the translucent bars; a short page has no such
+pixels. Everything below was built and tested on-device, and rejected:
+
+- **Scroll runway** - pad the document above and below, park the scroll offset in the
+  middle. Works, but the edges remain reachable and show black there, because once the page
+  has scrolled Safari stops falling back to the sampled tint.
+- **Pinning the visible layers** so the page looks static while the document scrolls - via
+  JS transform, `animation-timeline: scroll()`, `position: sticky`, and with `body` as the
+  scroll container. All four jitter on-device: the scroll runs on the compositor and the
+  pinned layer cannot keep up. `sticky` additionally gets clipped near the tab bar rather
+  than composited, same as `fixed`.
+- **`scroll-snap-type: y mandatory`** with a single snap point off the edge - holds a
+  non-zero scroll offset the user cannot rest away from. Closest of the lot, still scroll.
+
+**Do not use `position: fixed` or `sticky` for anything near a viewport edge.** iOS 26
+clips it instead of compositing, and it makes the bars go opaque. Widely reported.
+([Stack Overflow](https://stackoverflow.com/questions/79753701/))
+
+The only configuration that gets content genuinely under the chrome with no scrolling is a
+home-screen web app (`apple-mobile-web-app-capable`, `status-bar-style: black-translucent`),
+where the chrome is gone and the insets become real. Not added - it changes nothing for a
+normal visitor.
 
 ## Background
 

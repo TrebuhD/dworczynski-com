@@ -12,9 +12,11 @@
 
 <meta name="color-scheme" content="light dark">
 
-<!-- No theme-color on purpose. It paints the iOS status bar and toolbar a flat colour and
-     stops them tinting from the page, which showed up as solid bars above and below the
-     plate. color-scheme alone is enough for the browser to pick sane chrome. -->
+<!-- For Chrome/Android and iOS Safari before 26. Safari 26 ignores theme-color entirely
+     and tints its bars by sampling background-color off the page - see the note on body,
+     which is what actually controls those bars now. -->
+<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14140f" media="(prefers-color-scheme: dark)">
 
 
 <meta property="og:type" content="profile">
@@ -80,26 +82,28 @@
     -webkit-text-size-adjust: 100%;
     background: var(--bg);
     /* contain, not none: kills pull-to-refresh but leaves the iOS rubber band alone.
-       The background is fixed now, so the bounce no longer drags it out of place. */
+       Nothing here scrolls, so the bounce has nothing to drag out of place. */
     overscroll-behavior-y: contain;
   }
 
   body {
-    /* Must stay transparent. body is a block-level in-flow descendant, so its background
-       paints above the z-index -2 canvas - an opaque body hides the plate across the
-       whole text column. */
-    background: transparent;
+    /* Opaque, and load-bearing on iOS. Safari 26 tints the status bar and tab bar by
+       sampling background-color off the page, falling back to body's; a transparent body
+       gives it nothing to read and the bars land on the system default - black - against
+       a near-black page. That was the solid bars.
+       This is only safe because the plate no longer sits at a negative z-index behind
+       this background; it stacks above it now. See #plate. */
+    background: var(--bg);
     color: var(--fg);
     font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-variant-ligatures: none;
     margin: 0;
-    /* Match the plate's 100lvh. The plate is absolute, so it contributes scrollable
-       overflow; without this the document would be content-height and the plate would
-       stick a toolbar-height of empty scroll onto the bottom of a short page. With it,
-       the only scroll left is the ordinary iOS toolbar collapse, and the plate spans
-       exactly that far - scrolled to the bottom, plate bottom == document bottom. */
+    /* svh, not lvh. lvh is the toolbars-retracted height, so on a short page it forces
+       exactly one toolbar-height of empty scroll. svh is the height with the toolbars
+       showing - and since the page is then not scrollable at all, the toolbars never
+       retract, so svh stays the full visible area. */
     box-sizing: border-box;
-    min-height: 100lvh;
+    min-height: 100svh;
     padding: 14vh 7vw 4rem;
     /* Keep text clear of the notch in landscape, now that content spans the safe areas. */
     padding-left: max(7vw, env(safe-area-inset-left));
@@ -108,39 +112,43 @@
   }
 
   /* Chladni plate. Stays empty without WebGPU.
-     Absolute, never fixed. iOS Safari composites real page content behind the status bar
-     and toolbar, but a fixed element near a viewport edge makes it give up and paint a
-     flat tint from that element instead - that is the solid bars. Absolute resolves
-     against the initial containing block, so it covers the viewport just as well.
-     100lvh, so the plate still reaches the bottom once the toolbars retract and the
-     visible area grows past the layout viewport. body carries a matching min-height, so
-     this buys no extra scrollable overflow - see the note there. */
+     Absolute, never fixed: iOS 26 clips fixed content near the floating tab bar rather
+     than compositing it.
+     z-index 0, not -2. Negative would put it behind body's background, which would force
+     body transparent - and a transparent body is what left the iOS bars untinted. Above
+     the background, below the grain and the text. */
   #plate {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    z-index: -2;
+    z-index: 0;
     display: block;
     /* Explicit, not left/right:0. A canvas is a replaced element: with width:auto the
        box takes its intrinsic width (the width attribute) and right is ignored, so the
        plate stretched to the backing-store width and overflowed the page sideways. */
     width: 100%;
-    height: 100lvh;
+    height: 100svh;
     pointer-events: none;
   }
 
-  /* Tiled SVG noise. Absolute for the same reason as the plate. */
+  /* Tiled SVG noise. Absolute for the same reason as the plate, one layer above it. */
   .grain {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 100lvh;
-    z-index: -1;
+    height: 100svh;
+    z-index: 1;
     pointer-events: none;
     opacity: var(--grain-o);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  }
+
+  /* Above the plate and the grain, which are now positive z-index. */
+  main {
+    position: relative;
+    z-index: 2;
   }
 
   h1 {
@@ -201,6 +209,7 @@
 <canvas id="plate" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
 
+<main>
 <h1>Hubert Dworczyński</h1>
 <p class="tagline">Software engineer. Poznań, Poland.</p>
 
@@ -211,6 +220,7 @@
   <li><span class="label">linkedin</span><a href="https://www.linkedin.com/in/hubert-dworczynski/" rel="me">hubert-dworczynski</a></li>
   <li><span class="label">email</span><a id="mail" href="#">hubert at dworczynski.com</a></li>
 </ul>
+</main>
 
 <script>
   // Assembled at runtime to keep the address out of the HTML.

@@ -22,8 +22,9 @@ from fontTools.ttLib import TTCollection
 FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
 FACE = 1  # Helvetica Neue Bold
 GLYPH = "D"
-ACCENT = "#c2603a"
-DARK = "#14140f"
+INK_LIGHT = "#1a1a1a"  # --fg, light scheme: the tab strip is light, so the mark is dark
+INK_DARK = "#e8e5de"   # --fg, dark scheme
+DARK = "#14140f"       # --bg, dark scheme
 
 
 def path(pad, box=64):
@@ -56,9 +57,15 @@ if "--touch" in sys.argv:
     # Opaque on purpose: iOS composites transparency onto black, and applies its own
     # corner mask, so no rounding here either. Normal icon margin.
     print(svg(f'<rect width="64" height="64" fill="{DARK}"/>'
-              f'<path fill="{ACCENT}" d="{path(13)}"/>'))
+              f'<path fill="{INK_DARK}" d="{path(13)}"/>'))
 else:
-    mark = svg(f'<path fill="{ACCENT}" d="{path(1)}"/>')
+    # The tab strip follows the OS scheme, so the mark has to as well - a light mark
+    # would disappear on a light strip. SVG favicons honour prefers-color-scheme, and
+    # the default fill is the light-scheme ink so a browser that ignores the query
+    # still shows something legible.
+    style = (f"<style>path{{fill:{INK_LIGHT}}}"
+             f"@media(prefers-color-scheme:dark){{path{{fill:{INK_DARK}}}}}</style>")
+    mark = svg(f'{style}<path d="{path(1)}"/>')
     encoded = (mark.replace('"', "'").replace("#", "%23")
                    .replace("<", "%3C").replace(">", "%3E"))
     print(f"data:image/svg+xml,{encoded}")

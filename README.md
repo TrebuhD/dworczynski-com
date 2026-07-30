@@ -56,8 +56,11 @@ artwork by hand. macOS only; both shell out to Chrome or the system fonts.
   drift from the live page. Currently `lit / dark`. Ink is boosted 2.6x over the page,
   because at page opacity the plate is invisible at card size.
 - `make-mark.py` - prints the favicon data URI, `--touch` for the apple-touch-icon source,
-  `--card` for the OG card. The mark is a single node - one filled circle - so there is no
-  font dependency and nothing to convert to outlines. The accent clears 3.9:1 on the light
+  `--card` for the OG card, `--solid` to skip the dithering. The mark is a node - a solid
+  core with a rim screened through the same 4x4 ordered matrix the plate's shader uses -
+  so there is no font dependency and nothing to convert to outlines. The grid is 32
+  because it divides the 64-unit box evenly, keeping every coordinate an integer and the
+  path short; at 16 the dither eats the circular silhouette and the mark goes lopsided. The accent clears 3.9:1 on the light
   background and 4.5:1 on the dark one; check any replacement against **both**, since a
   colour that only works on one means the favicon dies in half of all browsers.
 - `og-gen.html` - the card layout `build-og.sh` screenshots.

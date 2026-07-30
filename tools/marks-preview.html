@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>D marks - round 2</title>
+<style>
+  body {
+    margin: 0; padding: 34px; background: #14140f; color: #e8e5de;
+    font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  h2 { font-size: 11px; color: #86817a; font-weight: 600; margin: 0 0 16px; letter-spacing: .08em; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 26px 20px; margin-bottom: 40px; }
+  .cell { background: #1b1a15; border-radius: 9px; padding: 14px 10px 10px; text-align: center; }
+  .big { font-size: 76px; line-height: 1; color: #c2603a; height: 84px;
+         display: flex; align-items: center; justify-content: center; }
+  .small { display: flex; align-items: flex-end; justify-content: center; gap: 12px;
+           height: 30px; margin: 6px 0 8px; }
+  .small span { color: #c2603a; line-height: 1; }
+  .s16 { font-size: 16px; } .s24 { font-size: 24px; }
+  /* the same letter on a light tab strip */
+  .lite { background: #fbfaf8; border-radius: 5px; padding: 3px 7px; }
+  .lite span { color: #c2603a; }
+  .name { color: #86817a; }
+  .w { color: #6e6a64; }
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script>
+  const GROUPS = [
+    ['DIDONE & HIGH CONTRAST', [
+      ['Didot', 400], ['Bodoni 72', 700], ['Big Caslon', 400],
+      ['Cochin', 700], ['STIX Two Text', 700],
+    ]],
+    ['SERIF & SLAB', [
+      ['Athelas', 700], ['Charter', 700], ['PT Serif', 700], ['Palatino', 700],
+      ['Georgia', 700], ['Superclarendon', 700], ['Rockwell', 700],
+      ['American Typewriter', 700], ['Baskerville', 700], ['Times', 700],
+    ]],
+    ['SANS & GEOMETRIC', [
+      ['Futura', 500], ['Avenir Next', 600], ['Gill Sans', 600], ['Optima', 700],
+      ['Seravek', 700], ['Helvetica Neue', 700], ['Impact', 400], ['Skia', 700],
+    ]],
+    ['DISPLAY & ODDITIES', [
+      ['Copperplate', 700], ['Phosphate', 400], ['Luminari', 400],
+      ['Herculanum', 400], ['Trattatello', 400], ['Marion', 700], ['Papyrus', 400],
+    ]],
+  ];
+  const out = document.getElementById('out');
+  for (const [title, faces] of GROUPS) {
+    const h = document.createElement('h2'); h.textContent = title; out.appendChild(h);
+    const g = document.createElement('div'); g.className = 'grid';
+    for (const [face, weight] of faces) {
+      const c = document.createElement('div');
+      c.className = 'cell';
+      const f = `font-family:'${face}';font-weight:${weight}`;
+      c.innerHTML =
+        `<div class="big" style="${f}">D</div>` +
+        `<div class="small">` +
+          `<span class="s24" style="${f}">D</span>` +
+          `<span class="s16" style="${f}">D</span>` +
+          `<span class="lite"><span class="s16" style="${f}">D</span></span>` +
+        `</div>` +
+        `<div class="name">${face}<br><span class="w">${weight}</span></div>`;
+      g.appendChild(c);
+    }
+    out.appendChild(g);
+  }
+</script>
+</body>
+</html>

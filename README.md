@@ -46,6 +46,23 @@ Adding another mail sender later (a newsletter service, a transactional provider
 its `include:` into the existing SPF record rather than adding a second TXT - a domain with two
 SPF records fails SPF entirely.
 
+## tools/
+
+Nothing here runs at build time - the site is static and these are only for regenerating
+artwork by hand. macOS only; both shell out to Chrome or the system fonts.
+
+- `build-og.sh [wash|glow|lit|poster] [dark|light]` - renders `og.png`. It extracts the
+  WGSL straight out of `index.html` and renders with the real shader, so the card cannot
+  drift from the live page. Currently `lit / dark`. Ink is boosted 2.6x over the page,
+  because at page opacity the plate is invisible at card size.
+- `make-mark.py` - prints the favicon data URI, or `--touch` for the apple-touch-icon
+  source. The glyph ships as a *path*, not `<text>`, so it does not depend on the viewer
+  having the font. Needs `pip install fonttools`.
+- `og-gen.html` - the card layout `build-og.sh` screenshots.
+- `marks-preview.html` - 30 typefaces as the `D`, each at display size and at 16/24px on
+  both light and dark. Open it directly. Check any new face at 16px before committing:
+  even stroke weights survive icon sizes, Didone hairlines do not.
+
 ## Notes
 
 - Email is assembled in JS at runtime so the address isn't plain text in the source. For the same

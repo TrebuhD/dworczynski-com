@@ -35,7 +35,7 @@ cp tools/og-gen.html "$WORK/"
 python3 - "$WORK/shader.wgsl" <<'PY'
 import pathlib, re, sys
 src = pathlib.Path("index.html").read_text()
-m = re.search(r"const mod = device\.createShaderModule\(\{ code: `(.*?)` \}\);", src, re.S)
+m = re.search(r"const SHADER = `(.*?)`;", src, re.S)
 if not m:
     sys.exit("could not find the shader in index.html")
 pathlib.Path(sys.argv[1]).write_text(m.group(1))
@@ -49,4 +49,11 @@ sleep 1
   --screenshot="$PWD/og.png" --window-size=1200,630 --virtual-time-budget=5000 \
   "http://localhost:8799/og-gen.html?mode=$MODE&style=$STYLE&t=40" >/dev/null 2>&1
 
-echo "og.png <- $STYLE_NAME / $MODE"
+# Chrome writes ~230K of 24-bit RGB. The card is a dither screen over two flat tones, so
+# a 4-bit palette is lossless in practice and lands around 55K. Optional - without
+# pngquant on PATH the card is just larger.
+if command -v pngquant >/dev/null 2>&1; then
+  pngquant --quality=65-92 --speed 1 --strip --force --output og.png og.png
+fi
+
+echo "og.png <- $STYLE_NAME / $MODE ($(du -h og.png | cut -f1))"

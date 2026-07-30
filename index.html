@@ -58,11 +58,15 @@
 </script>
 
 <style>
+  /* --rule is decorative (the hr) and stays faint. --link-line is an affordance - the
+     link colour is the text colour, so the underline is the only thing marking a link -
+     and carries its own value at the 3:1 WCAG 1.4.11 floor. */
   :root {
     --bg: #fbfaf8;
     --fg: #1a1a1a;
-    --dim: #7a7670;
+    --dim: #736f69;
     --rule: #e0ddd7;
+    --link-line: #928d86;
     --accent: #1a1a1a;
     --grain-o: 0.26;
   }
@@ -72,6 +76,7 @@
       --fg: #e8e5de;
       --dim: #86817a;
       --rule: #2c2b26;
+      --link-line: #6b675e;
       --accent: #e8e5de;
       --grain-o: 0.11;
     }
@@ -106,6 +111,11 @@
        showing - and since the page is then not scrollable at all, the toolbars never
        retract, so svh stays the full visible area. */
     min-height: 100svh;
+    /* The containing block for the plate and the grain, so those size to the document
+       rather than to the viewport. Without it they resolve against the initial containing
+       block, and any overflow - large-text settings, Firefox text-only zoom, a short
+       landscape phone - left the texture ending mid-page against flat background. */
+    position: relative;
   }
 
   /* Chladni plate. Stays empty without WebGPU.
@@ -123,9 +133,10 @@
     display: block;
     /* Explicit, not left/right:0. A canvas is a replaced element: with width:auto the
        box takes its intrinsic width (the width attribute) and right is ignored, so the
-       plate stretched to the backing-store width and overflowed the page sideways. */
+       plate stretched to the backing-store width and overflowed the page sideways. The
+       same applies to height, hence 100% rather than bottom:0. */
     width: 100%;
-    height: 100svh;
+    height: 100%;
     pointer-events: none;
   }
 
@@ -135,7 +146,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 100svh;
+    bottom: 0;
     z-index: 1;
     pointer-events: none;
     opacity: var(--grain-o);
@@ -179,7 +190,12 @@
     padding: 0;
   }
 
-  li { margin-bottom: 0.4rem; }
+  /* anywhere, not break-word: it also lowers the min-content width, so the address - one
+     unbreakable monospace token - stops forcing a sideways scroll at large text sizes. */
+  li {
+    margin-bottom: 0.4rem;
+    overflow-wrap: anywhere;
+  }
 
   .label {
     color: var(--dim);
@@ -187,11 +203,14 @@
     min-width: 6.5rem;
   }
 
+  /* Vertical padding does two jobs: it takes the hit box from 20 to 24px for WCAG 2.5.8,
+     and it drops the underline clear of the descenders it used to cut through at 1px. */
   a {
     color: var(--accent);
     text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 1px;
+    border-bottom: 1px solid var(--link-line);
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 
   a:hover { border-bottom-color: var(--accent); }
@@ -222,17 +241,21 @@
 <ul>
   <li><span class="label">github</span><a href="https://github.com/TrebuhD" rel="me">TrebuhD</a></li>
   <li><span class="label">linkedin</span><a href="https://www.linkedin.com/in/hubert-dworczynski/" rel="me">hubert-dworczynski</a></li>
-  <li><span class="label">email</span><a id="mail" href="#">hubert at dworczynski.com</a></li>
+  <li><span class="label">email</span><span id="mail">hubert at dworczynski.com</span></li>
 </ul>
 </main>
 
 <script>
-  // Assembled at runtime to keep the address out of the HTML.
+  // Assembled at runtime to keep the address out of the HTML. Ships as a span and is
+  // promoted to a link here, so without JS it degrades to readable text rather than to
+  // an anchor pointing at "#".
   (function () {
-    var a = document.getElementById('mail');
+    var el = document.getElementById('mail');
     var addr = ['hubert', 'dworczynski.com'].join('@');
+    var a = document.createElement('a');
     a.href = 'mailto:' + addr;
     a.textContent = addr;
+    el.replaceWith(a);
   })();
 </script>
 
@@ -244,16 +267,8 @@
 // The field is rendered as tone, not as its nodal lines: a 2-level dithered screen over
 // broad soft regions. One of four tone mappings is picked per page load.
 const canvas = document.getElementById('plate');
-if (!navigator.gpu) throw 0;
 
-const adapter = await navigator.gpu.requestAdapter();
-if (!adapter) throw 0;
-const device = await adapter.requestDevice();
-const format = navigator.gpu.getPreferredCanvasFormat();
-const ctx = canvas.getContext('webgpu');
-ctx.configure({ device, format, alphaMode: 'premultiplied' });
-
-const mod = device.createShaderModule({ code: `
+const SHADER = `
 struct U {
   res: vec2f, a: vec2f, b: vec2f, mix: vec2f, lam: vec2f,
   opacity: f32, style: f32, gref: f32, warp: f32,
@@ -331,44 +346,7 @@ fn screen(L0: f32, cell: vec2f) -> f32 {
 
   let a = screen(L, cell) * u.opacity;
   return vec4f(u.ink.rgb * a, a);
-}` });
-
-const pipe = device.createRenderPipeline({
-  layout: 'auto',
-  vertex: { module: mod, entryPoint: 'vs' },
-  fragment: {
-    module: mod, entryPoint: 'fs',
-    targets: [{ format, blend: {
-      color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
-      alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
-    } }],
-  },
-  primitive: { topology: 'triangle-list' },
-});
-
-const ubuf = device.createBuffer({ size: 96, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-const udata = new Float32Array(24);
-const bind = device.createBindGroup({
-  layout: pipe.getBindGroupLayout(0),
-  entries: [{ binding: 0, resource: { buffer: ubuf } }],
-});
-
-let dpr = 1;
-function resize() {
-  dpr = Math.min(devicePixelRatio || 1, 2);
-  // Measure the element, not the window: with 100lvh the canvas is taller than
-  // innerHeight on iOS, and sizing off the window would stretch the render.
-  const cw = canvas.clientWidth || innerWidth;
-  const ch = canvas.clientHeight || innerHeight;
-  const w = Math.max(1, Math.floor(cw * dpr));
-  const h = Math.max(1, Math.floor(ch * dpr));
-  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-}
-resize();
-addEventListener('resize', resize);
-addEventListener('orientationchange', resize);
-// iOS fires this, not resize, when the toolbars slide.
-visualViewport?.addEventListener('resize', resize);
+}`;
 
 // Master clock. Small number = slow drift; the whole look hangs off this.
 const SPEED = 0.055;
@@ -392,80 +370,161 @@ const NZ        = [0.10, 0.10, 0.06, 0.14];
 const dark = matchMedia('(prefers-color-scheme: dark)');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
-let hidden = false;
-addEventListener('visibilitychange', () => { hidden = document.hidden; });
+// Firefox, and Safari before 26, stop here and the plate stays empty - the page is built
+// to read without it. Plain control flow, not a throw: at module top level a throw lands
+// in the console as an uncaught rejection on every one of those loads.
+const adapter = navigator.gpu && await navigator.gpu.requestAdapter();
+if (adapter) start(await adapter.requestDevice());
 
-// 40fps is indistinguishable from 120 at this speed and cheaper.
-const MIN_DT = 1000 / 40;
-let last = -1e9;
-const t0 = performance.now();
+function start(device) {
+  const format = navigator.gpu.getPreferredCanvasFormat();
+  const ctx = canvas.getContext('webgpu');
+  ctx.configure({ device, format, alphaMode: 'premultiplied' });
 
-function draw(now) {
-  requestAnimationFrame(draw);
-  if (hidden || now - last < MIN_DT) return;
-  last = now;
+  const mod = device.createShaderModule({ code: SHADER });
 
-  // reduced-motion pins time to one arbitrary but decent-looking frame.
-  const t = (reduced.matches ? 40.0 : (now - t0) / 1000) * SPEED;
-
-  // Incommensurate frequencies, so the four mode numbers never line up twice and the
-  // pattern never repeats. Two octaves each: the slow one carries the shape, the fast
-  // one keeps the field from ever going still.
-  const an = CENTER[0] + 2.2 * Math.sin(t * 0.41) + 0.6 * Math.sin(t * 0.97 + 1.3);
-  const am = CENTER[1] + 1.7 * Math.cos(t * 0.33) + 0.5 * Math.sin(t * 1.13 + 0.4);
-  const bn = CENTER[2] + 1.9 * Math.sin(t * 0.29 + 2.1) + 0.5 * Math.cos(t * 0.83);
-  const bm = CENTER[3] + 1.5 * Math.cos(t * 0.47 + 1.1) + 0.5 * Math.sin(t * 0.71);
-
-  // Rotating superposition. At the poles one term owns the plate, between them the
-  // field is a hybrid - this is what turns a drift into a change of shape.
-  const th = t * 0.53 + 0.7 * Math.sin(t * 0.19);
-  const isDark = dark.matches;
-
-  const lam1 = 1 + 0.35 * Math.sin(t * 0.61 + 0.9);
-  const lam2 = 1 + 0.35 * Math.cos(t * 0.53 + 2.4);
-  const mx = Math.cos(th), my = Math.sin(th);
-
-  udata[0] = canvas.width;
-  udata[1] = canvas.height;
-  udata[2] = an;
-  udata[3] = am;
-  udata[4] = bn;
-  udata[5] = bm;
-  udata[6] = mx;
-  udata[7] = my;
-  udata[8] = lam1;
-  udata[9] = lam2;
-  udata[10] = isDark ? OPACITY[STYLE] : OPACITY_L[STYLE];
-  udata[11] = STYLE;
-  // Mean |gradient| per pixel, for the steepness term in 'lit'.
-  udata[12] = Math.PI * ((an + am + bn + bm) / 4) / canvas.height;
-  udata[13] = t * 0.7;
-  udata[14] = THR[STYLE];
-  udata[15] = NZ[STYLE];
-  udata[16] = 2.0 * dpr;   // dot cell in device px, so it holds ~2 css px on retina
-  // |v| cannot exceed this; half of it spans the interesting part of the tone ramp.
-  udata[17] = 0.55 * (Math.abs(mx) * (1 + lam1) + Math.abs(my) * (1 + lam2));
-  udata[20] = isDark ? 0.91 : 0.10;
-  udata[21] = isDark ? 0.90 : 0.10;
-  udata[22] = isDark ? 0.87 : 0.10;
-  udata[23] = 1;
-  device.queue.writeBuffer(ubuf, 0, udata);
-
-  const enc = device.createCommandEncoder();
-  const pass = enc.beginRenderPass({
-    colorAttachments: [{
-      view: ctx.getCurrentTexture().createView(),
-      clearValue: { r: 0, g: 0, b: 0, a: 0 },
-      loadOp: 'clear', storeOp: 'store',
-    }],
+  const pipe = device.createRenderPipeline({
+    layout: 'auto',
+    vertex: { module: mod, entryPoint: 'vs' },
+    fragment: {
+      module: mod, entryPoint: 'fs',
+      targets: [{ format, blend: {
+        color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+        alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+      } }],
+    },
+    primitive: { topology: 'triangle-list' },
   });
-  pass.setPipeline(pipe);
-  pass.setBindGroup(0, bind);
-  pass.draw(3);
-  pass.end();
-  device.queue.submit([enc.finish()]);
+
+  const ubuf = device.createBuffer({ size: 96, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+  const udata = new Float32Array(24);
+  const bind = device.createBindGroup({
+    layout: pipe.getBindGroupLayout(0),
+    entries: [{ binding: 0, resource: { buffer: ubuf } }],
+  });
+
+  let dpr = 1;
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    // Measure the element, not the window: the canvas now spans the document, which on
+    // an overflowing page is taller than innerHeight, and on iOS is taller again.
+    const cw = canvas.clientWidth || innerWidth;
+    const ch = canvas.clientHeight || innerHeight;
+    const w = Math.max(1, Math.floor(cw * dpr));
+    const h = Math.max(1, Math.floor(ch * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  }
+  resize();
+
+  // 40fps is indistinguishable from 120 at this speed and cheaper.
+  const MIN_DT = 1000 / 40;
+  // reduced-motion pins time to one arbitrary but decent-looking frame.
+  const PINNED = 40.0 * SPEED;
+  const t0 = performance.now();
+  let last = -1e9;
+  let running = false;
+  let hidden = false;
+
+  function render(t) {
+    // Incommensurate frequencies, so the four mode numbers never line up twice and the
+    // pattern never repeats. Two octaves each: the slow one carries the shape, the fast
+    // one keeps the field from ever going still.
+    const an = CENTER[0] + 2.2 * Math.sin(t * 0.41) + 0.6 * Math.sin(t * 0.97 + 1.3);
+    const am = CENTER[1] + 1.7 * Math.cos(t * 0.33) + 0.5 * Math.sin(t * 1.13 + 0.4);
+    const bn = CENTER[2] + 1.9 * Math.sin(t * 0.29 + 2.1) + 0.5 * Math.cos(t * 0.83);
+    const bm = CENTER[3] + 1.5 * Math.cos(t * 0.47 + 1.1) + 0.5 * Math.sin(t * 0.71);
+
+    // Rotating superposition. At the poles one term owns the plate, between them the
+    // field is a hybrid - this is what turns a drift into a change of shape.
+    const th = t * 0.53 + 0.7 * Math.sin(t * 0.19);
+    const isDark = dark.matches;
+
+    const lam1 = 1 + 0.35 * Math.sin(t * 0.61 + 0.9);
+    const lam2 = 1 + 0.35 * Math.cos(t * 0.53 + 2.4);
+    const mx = Math.cos(th), my = Math.sin(th);
+
+    udata[0] = canvas.width;
+    udata[1] = canvas.height;
+    udata[2] = an;
+    udata[3] = am;
+    udata[4] = bn;
+    udata[5] = bm;
+    udata[6] = mx;
+    udata[7] = my;
+    udata[8] = lam1;
+    udata[9] = lam2;
+    udata[10] = isDark ? OPACITY[STYLE] : OPACITY_L[STYLE];
+    udata[11] = STYLE;
+    // Mean |gradient| per pixel, for the steepness term in 'lit'.
+    udata[12] = Math.PI * ((an + am + bn + bm) / 4) / canvas.height;
+    udata[13] = t * 0.7;
+    udata[14] = THR[STYLE];
+    udata[15] = NZ[STYLE];
+    udata[16] = 2.0 * dpr;   // dot cell in device px, so it holds ~2 css px on retina
+    // |v| cannot exceed this; half of it spans the interesting part of the tone ramp.
+    udata[17] = 0.55 * (Math.abs(mx) * (1 + lam1) + Math.abs(my) * (1 + lam2));
+    udata[20] = isDark ? 0.91 : 0.10;
+    udata[21] = isDark ? 0.90 : 0.10;
+    udata[22] = isDark ? 0.87 : 0.10;
+    udata[23] = 1;
+    device.queue.writeBuffer(ubuf, 0, udata);
+
+    const enc = device.createCommandEncoder();
+    const pass = enc.beginRenderPass({
+      colorAttachments: [{
+        view: ctx.getCurrentTexture().createView(),
+        clearValue: { r: 0, g: 0, b: 0, a: 0 },
+        loadOp: 'clear', storeOp: 'store',
+      }],
+    });
+    pass.setPipeline(pipe);
+    pass.setBindGroup(0, bind);
+    pass.draw(3);
+    pass.end();
+    device.queue.submit([enc.finish()]);
+  }
+
+  // Under reduced motion every frame is the same frame, so the loop draws it once and
+  // stops rather than re-uploading identical uniforms at 40fps for the life of the tab.
+  function loop(now) {
+    if (reduced.matches) { running = false; render(PINNED); return; }
+    requestAnimationFrame(loop);
+    if (hidden || now - last < MIN_DT) return;
+    last = now;
+    render((now - t0) / 1000 * SPEED);
+  }
+
+  // The way back in once the loop has stopped: a resize drops the backing store, and a
+  // scheme flip restains the ink. Both need a frame that nothing else is going to draw.
+  function kick() {
+    if (reduced.matches) { render(PINNED); return; }
+    if (running) return;
+    running = true;
+    requestAnimationFrame(loop);
+  }
+
+  // Coalesced onto a frame: resize fires continuously through a window drag and every
+  // pass reallocates the backing store.
+  let queued = false;
+  function onResize() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; resize(); kick(); });
+  }
+
+  addEventListener('resize', onResize);
+  addEventListener('orientationchange', onResize);
+  // iOS fires this, not resize, when the toolbars slide.
+  visualViewport?.addEventListener('resize', onResize);
+  dark.addEventListener('change', kick);
+  reduced.addEventListener('change', kick);
+  addEventListener('visibilitychange', () => {
+    hidden = document.hidden;
+    if (!hidden) kick();
+  });
+
+  kick();
 }
-requestAnimationFrame(draw);
 </script>
 
 </body>

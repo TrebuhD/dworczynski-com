@@ -54,7 +54,9 @@ artwork by hand. macOS only; both shell out to Chrome or the system fonts.
 - `build-og.sh [wash|glow|lit|poster] [dark|light]` - renders `og.png`. It extracts the
   WGSL straight out of `index.html` and renders with the real shader, so the card cannot
   drift from the live page. Currently `lit / dark`. Ink is boosted 2.6x over the page,
-  because at page opacity the plate is invisible at card size.
+  because at page opacity the plate is invisible at card size. Runs `pngquant` at the end
+  if it is on PATH: Chrome writes ~230K of 24-bit RGB, and since the card is a dither
+  screen over two flat tones a 4-bit palette is lossless in practice and lands near 55K.
 - `make-mark.py` - prints the favicon data URI, `--touch` for the apple-touch-icon source,
   `--card` for the OG card, `--solid` to skip the dithering. The mark is a node - a solid
   core with a rim screened through the same 4x4 ordered matrix the plate's shader uses -
@@ -73,8 +75,13 @@ artwork by hand. macOS only; both shell out to Chrome or the system fonts.
 
 - Email is assembled in JS at runtime so the address isn't plain text in the source. For the same
   reason it is deliberately absent from the JSON-LD and from `llms.txt` - putting it in either would
-  hand it straight back to scrapers.
+  hand it straight back to scrapers. It ships as a `span` and is promoted to an anchor by the
+  script, so with JS off it degrades to readable text rather than to a link pointing at `#`.
 - Dark mode follows `prefers-color-scheme`; both palettes are in the `:root` block.
+- `--rule` and `--link-line` are separate on purpose. The link colour *is* the text colour, so the
+  underline is the only thing marking a link and has to clear 3:1 (WCAG 1.4.11); the `hr` is
+  decorative and stays faint. Sharing one token put the underline at 1.3:1, near-invisible.
+  `--dim` sits at 4.8:1 in both schemes - it was 4.33:1 in light, under the 4.5:1 floor.
 - Favicon is an inline SVG data URI. Nothing on the page triggers an external request; `og.png` and
   `apple-touch-icon.png` are same-origin and are not fetched during a normal page load.
 - Fonts are the system mono stack. No webfonts, so no FOUT and no network dependency.
@@ -83,10 +90,17 @@ artwork by hand. macOS only; both shell out to Chrome or the system fonts.
   - the backing-store `width` attribute - and the `right` offset is ignored. Left as
   `left/right: 0` it stretched to the backing width and overflowed the page sideways, which
   then fed back into the JS resize loop.
-- `body` carries `min-height: 100svh`, and the plate and grain are `100svh` too. `svh` is
-  the height with the iOS toolbars showing; `lvh` is the retracted height, and using it
-  forces exactly one toolbar-height of empty scroll onto a short page. Since the page is
-  then not scrollable, the toolbars never retract and `svh` stays the full visible area.
+- `body` carries `min-height: 100svh`. `svh` is the height with the iOS toolbars showing;
+  `lvh` is the retracted height, and using it forces exactly one toolbar-height of empty
+  scroll onto a short page. Since the page is then not scrollable, the toolbars never
+  retract and `svh` stays the full visible area.
+- **The plate and grain size to `body`, not to the viewport.** `body` is
+  `position: relative` for exactly this; without it they resolve against the initial
+  containing block and cap at viewport height. They were `100svh` and left the texture
+  ending mid-page against flat background whenever the content overflowed - large-text
+  settings, Firefox text-only zoom, a short landscape phone.
+- The text column is anchored near the top (`14vh`), not vertically centred. Tried
+  centring; the page reads better with the block high and the empty space below it.
 - `overscroll-behavior-y: contain` kills pull-to-refresh but leaves the iOS rubber band
   alone. `none` killed the bounce too and made scrolling feel dead.
 

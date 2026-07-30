@@ -55,15 +55,20 @@ SPF records fails SPF entirely.
 - Favicon is an inline SVG data URI. Nothing on the page triggers an external request; `og.png` and
   `apple-touch-icon.png` are same-origin and are not fetched during a normal page load.
 - Fonts are the system mono stack. No webfonts, so no FOUT and no network dependency.
-- **Nothing on this page may be `position: fixed`.** iOS 26 Safari composites real page
-  content behind the status bar and toolbar, but if it finds a fixed element near a viewport
-  edge it abandons that and paints a flat tint sampled from the element's `background-color`
-  instead. A fixed background layer is what put solid bars at the top and bottom of this
-  page. The plate and the grain are `position: absolute`, resolved against the initial
-  containing block, which covers the viewport just as well on a page that does not scroll.
-  `theme-color` is kept for Chrome/Android and iOS Safari before 26, which do use it.
-- `overscroll-behavior-y: none` kills pull-to-refresh. Without it, dragging past the top
-  hauls the fixed canvas down with the page, since iOS moves fixed layers on rubber-band.
+- **No `theme-color`.** It paints the iOS status bar and toolbar a flat colour and stops
+  them tinting from the page underneath - that is what put solid bars above and below the
+  plate. `color-scheme: light dark` is enough for the browser to pick sane chrome, and with
+  `viewport-fit=cover` the plate composites behind the bars on its own.
+- **The background layers are `position: fixed`, and both axes matter.** An absolutely
+  positioned box still contributes scrollable overflow, so a `100lvh` plate made the
+  document taller than the iOS *small* viewport and the page picked up a phantom scroll of
+  exactly one toolbar-height, over nothing, dragging the background with it. Fixed adds no
+  overflow. Height is `100lvh` rather than `100%` so the layer does not resize as the
+  toolbars slide between the small and large viewport - a resizing fixed box re-scales the
+  field on every scroll. Sized with `left/right: 0`, not `100vw`, which would count the
+  desktop scrollbar and overflow horizontally.
+- `overscroll-behavior-y: contain` kills pull-to-refresh but leaves the iOS rubber band
+  alone. `none` killed the bounce too and made scrolling feel dead.
 
 ## Background
 

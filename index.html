@@ -12,11 +12,9 @@
 
 <meta name="color-scheme" content="light dark">
 
-<!-- For Chrome/Android and iOS Safari before 26. Safari 26+ ignores theme-color and
-     composites the page itself behind its bars, provided nothing on the page is
-     position:fixed near a viewport edge - see the note on #plate. -->
-<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14140f" media="(prefers-color-scheme: dark)">
+<!-- No theme-color on purpose. It paints the iOS status bar and toolbar a flat colour and
+     stops them tinting from the page, which showed up as solid bars above and below the
+     plate. color-scheme alone is enough for the browser to pick sane chrome. -->
 
 
 <meta property="og:type" content="profile">
@@ -81,9 +79,9 @@
   html {
     -webkit-text-size-adjust: 100%;
     background: var(--bg);
-    /* Kills pull-to-refresh and the overscroll bounce, which dragged the background out
-       of place. Nothing here scrolls far enough for the bounce to earn its keep. */
-    overscroll-behavior-y: none;
+    /* contain, not none: kills pull-to-refresh but leaves the iOS rubber band alone.
+       The background is fixed now, so the bounce no longer drags it out of place. */
+    overscroll-behavior-y: contain;
   }
 
   body {
@@ -91,7 +89,6 @@
        paints above the z-index -2 canvas - an opaque body hides the plate across the
        whole text column. */
     background: transparent;
-    overscroll-behavior-y: none;
     color: var(--fg);
     font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-variant-ligatures: none;
@@ -104,29 +101,30 @@
   }
 
   /* Chladni plate. Stays empty without WebGPU.
-     Absolute, not fixed, and that is load-bearing: iOS 26 Safari composites real page
-     content behind the status bar and toolbar, but the moment it finds a fixed element
-     near a viewport edge it gives up and paints a flat tint sampled from that element
-     instead. A fixed background is what put solid bars on this page. Absolute resolves
-     against the initial containing block, so this still covers the viewport. */
+     Fixed, not absolute: an absolutely positioned box still adds to the scrollable
+     overflow, so a 100lvh plate made the document taller than the iOS small viewport and
+     the page picked up a phantom scroll of exactly one toolbar-height, dragging the
+     background with it. Fixed contributes no overflow and never moves.
+     Height is pinned to 100lvh rather than 100% so the plate does not resize as the iOS
+     toolbars slide between the small and large viewport - a resizing fixed box would make
+     the field re-scale on every scroll. */
   #plate {
-    position: absolute;
-    inset: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
     z-index: -2;
+    right: 0;
     display: block;
-    width: 100%;
-    height: 100%;
-    /* Large viewport, so the canvas still covers the screen when the iOS toolbars
-       retract and the layout viewport is shorter than the display. */
     height: 100lvh;
     pointer-events: none;
   }
 
-  /* Tiled SVG noise. Absolute for the same reason as the plate. */
+  /* Tiled SVG noise. Fixed for the same reason as the plate. */
   .grain {
-    position: absolute;
-    inset: 0;
-    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 100lvh;
     z-index: -1;
     pointer-events: none;

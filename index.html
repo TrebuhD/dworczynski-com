@@ -94,7 +94,11 @@
   }
 
   body {
-    background: transparent;
+    /* Explicit, not transparent: when Safari finds no usable fixed element it falls back
+       to the body colour, and a transparent body left the bottom toolbar on its default
+       light material even in dark mode. Same value as html, so nothing changes visually -
+       the body box is only 34rem wide, so a different colour here would show. */
+    background-color: var(--bg);
     overscroll-behavior-y: none;
     color: var(--fg);
     font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -128,11 +132,10 @@
      the plate and the grain compete for the sample. */
   #chrome {
     position: fixed;
-    /* Bleeds past both edges on purpose. Sitting flush at inset 0 the bottom toolbar
-       never sampled it and fell back to Safari's default light material, dark mode or
-       not - the sampler has to extend past the viewport for the toolbar to take it.
-       Fixed elements are out of flow, so this adds no scrollable area. */
-    inset: -25vh 0;
+    /* Flush. Bleeding it past the edges was tried and made no difference to the bottom
+       toolbar, so this stays in the configuration where the status bar demonstrably
+       samples it. */
+    inset: 0;
     z-index: -3;
     opacity: 0;
     pointer-events: none;

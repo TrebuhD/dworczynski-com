@@ -55,6 +55,14 @@ SPF records fails SPF entirely.
 - Favicon is an inline SVG data URI. Nothing on the page triggers an external request; `og.png` and
   `apple-touch-icon.png` are same-origin and are not fetched during a normal page load.
 - Fonts are the system mono stack. No webfonts, so no FOUT and no network dependency.
+- The browser chrome is tinted with the page background deliberately, so the bars read as
+  part of the page. It takes two mechanisms: `theme-color` for Chrome/Android and iOS Safari
+  before 26, and a `background-color` on `#plate` for iOS 26+, which ignores `theme-color`
+  and instead samples fixed elements near the viewport edges. Keep the three values in sync.
+  Safari reads CSS only, never rendered pixels, so the bars can never show the plate itself -
+  that is a browser-chrome limit, not something left unfinished (unchanged in Safari 27 beta).
+- `overscroll-behavior-y: none` kills pull-to-refresh. Without it, dragging past the top
+  hauls the fixed canvas down with the page, since iOS moves fixed layers on rubber-band.
 
 ## Background
 

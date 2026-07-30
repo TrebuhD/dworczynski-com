@@ -11,9 +11,14 @@
 <link rel="canonical" href="https://dworczynski.com/">
 
 <meta name="color-scheme" content="light dark">
-<!-- No theme-color on purpose. Set to --bg it made iOS Safari fill the status bar and
-     toolbar with flat slabs of the background, which read as the page failing to reach
-     the screen edges. Without it Safari samples the page itself for the chrome tint. -->
+
+<!-- Browser chrome is painted with the page background on purpose, so the bars read as
+     part of the page rather than as a seam. Two mechanisms, because they don't overlap:
+     theme-color for Chrome/Android and iOS Safari before 26; iOS 26+ ignores theme-color
+     entirely and instead samples background-color off fixed elements near the viewport
+     edges, which is why #plate carries an explicit one. Keep all three in sync. -->
+<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14140f" media="(prefers-color-scheme: dark)">
 
 
 <meta property="og:type" content="profile">
@@ -78,10 +83,15 @@
   html {
     -webkit-text-size-adjust: 100%;
     background: var(--bg);
+    /* Kills pull-to-refresh and the overscroll bounce. Dragging past the top hauled the
+       fixed canvas down with it, which looks broken - iOS moves fixed layers during
+       rubber-band. Nothing here scrolls far enough for the bounce to be worth keeping. */
+    overscroll-behavior-y: none;
   }
 
   body {
     background: transparent;
+    overscroll-behavior-y: none;
     color: var(--fg);
     font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-variant-ligatures: none;
@@ -99,6 +109,11 @@
     inset: 0;
     z-index: -2;
     display: block;
+    /* What iOS 26+ Safari samples for its toolbar and status bar tint: the declared
+       background-color of a fixed element near the edges. It reads CSS only, never the
+       rendered canvas, so the bars can never show the animation - only this flat colour.
+       Visually a no-op here, since the canvas already composites over the same colour. */
+    background-color: var(--bg);
     width: 100%;
     height: 100%;
     /* Large viewport, so the canvas still covers the screen when the iOS toolbars

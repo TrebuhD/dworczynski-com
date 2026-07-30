@@ -55,20 +55,34 @@ SPF records fails SPF entirely.
 - Favicon is an inline SVG data URI. Nothing on the page triggers an external request; `og.png` and
   `apple-touch-icon.png` are same-origin and are not fetched during a normal page load.
 - Fonts are the system mono stack. No webfonts, so no FOUT and no network dependency.
-- **No `theme-color`.** It paints the iOS status bar and toolbar a flat colour and stops
-  them tinting from the page underneath - that is what put solid bars above and below the
-  plate. `color-scheme: light dark` is enough for the browser to pick sane chrome, and with
-  `viewport-fit=cover` the plate composites behind the bars on its own.
-- **The background layers are `position: fixed`, and both axes matter.** An absolutely
-  positioned box still contributes scrollable overflow, so a `100lvh` plate made the
-  document taller than the iOS *small* viewport and the page picked up a phantom scroll of
-  exactly one toolbar-height, over nothing, dragging the background with it. Fixed adds no
-  overflow. Height is `100lvh` rather than `100%` so the layer does not resize as the
-  toolbars slide between the small and large viewport - a resizing fixed box re-scales the
-  field on every scroll. Sized with `left/right: 0`, not `100vw`, which would count the
-  desktop scrollbar and overflow horizontally.
+- **`#plate` needs an explicit `width`/`height`; `inset: 0` alone will not do it.** A
+  `canvas` is a replaced element, so with `width: auto` the box takes its *intrinsic* size
+  - the backing-store `width` attribute - and the `right` offset is ignored. Left as
+  `left/right: 0` it stretched to the backing width and overflowed the page sideways, which
+  then fed back into the JS resize loop. Verified in Chromium at a 390px viewport.
+- `body` carries `min-height: 100lvh` to match the plate. The plate is absolutely
+  positioned and so still contributes scrollable overflow; without the matching
+  `min-height` the document is content-height and the plate adds a toolbar-height of empty
+  scroll to the bottom of a short page. Verified: vertical overflow is 0 either way now.
 - `overscroll-behavior-y: contain` kills pull-to-refresh but leaves the iOS rubber band
   alone. `none` killed the bounce too and made scrolling feel dead.
+
+### Unresolved: the iOS status bar and toolbar
+
+Solid bars still appear above and below the plate on iOS Safari, where other sites show
+page content. **The cause is not established** - the notes previously here asserted a
+mechanism (`position: fixed` near a viewport edge makes Safari abandon compositing and
+paint a flat tint) that was never confirmed, and flip-flopping the plate between `fixed`
+and `absolute` did not fix it either way. Treat that claim as unverified.
+
+What is known:
+
+- `theme-color` is gone. It definitely does hardcode the bar tint on iOS, so it had to go
+  before anything else could be tested, but removing it alone did not fix the bars.
+- `viewport-fit=cover` is set, so the layout viewport does span the safe areas.
+- None of this reproduces in Chromium, which is the only engine testable here. It needs a
+  real device, and ideally a screenshot plus the iOS version to tell a chrome tint apart
+  from a safe-area gap.
 
 ## Background
 

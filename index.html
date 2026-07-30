@@ -12,13 +12,11 @@
 
 <meta name="color-scheme" content="light dark">
 
-<!-- Browser chrome gets its own colour, a shade off --bg, so the bars frame the page
-     rather than pretending to be it - they cannot show the plate, so they may as well be
-     deliberate. Two mechanisms, because they don't overlap: theme-color for Chrome/Android
-     and iOS Safari before 26; iOS 26+ ignores theme-color entirely and samples the
-     background-color of #chrome instead. These must match --chrome in the CSS. -->
-<meta name="theme-color" content="#f1eee7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0c0c09" media="(prefers-color-scheme: dark)">
+<!-- For Chrome/Android and iOS Safari before 26. Safari 26+ ignores theme-color and
+     composites the page itself behind its bars, provided nothing on the page is
+     position:fixed near a viewport edge - see the note on #plate. -->
+<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14140f" media="(prefers-color-scheme: dark)">
 
 
 <meta property="og:type" content="profile">
@@ -67,9 +65,6 @@
     --rule: #e0ddd7;
     --accent: #1a1a1a;
     --grain-o: 0.26;
-    /* Browser chrome, deliberately a shade off --bg so the bars frame the page instead
-       of pretending to be it. Mirror any change in the theme-color metas. */
-    --chrome: #f1eee7;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -79,7 +74,6 @@
       --rule: #2c2b26;
       --accent: #e8e5de;
       --grain-o: 0.11;
-      --chrome: #0c0c09;
     }
     body { -webkit-font-smoothing: antialiased; }
   }
@@ -87,17 +81,15 @@
   html {
     -webkit-text-size-adjust: 100%;
     background: var(--bg);
-    /* Kills pull-to-refresh and the overscroll bounce. Dragging past the top hauled the
-       fixed canvas down with it, which looks broken - iOS moves fixed layers during
-       rubber-band. Nothing here scrolls far enough for the bounce to be worth keeping. */
+    /* Kills pull-to-refresh and the overscroll bounce, which dragged the background out
+       of place. Nothing here scrolls far enough for the bounce to earn its keep. */
     overscroll-behavior-y: none;
   }
 
   body {
     /* Must stay transparent. body is a block-level in-flow descendant, so its background
-       paints above the z-index -2 canvas - an opaque body covers the plate across the
-       whole text column. Safari's body-colour fallback is not available to us because of
-       this, whatever the toolbar does. */
+       paints above the z-index -2 canvas - an opaque body hides the plate across the
+       whole text column. */
     background: transparent;
     overscroll-behavior-y: none;
     color: var(--fg);
@@ -111,9 +103,14 @@
     max-width: 34rem;
   }
 
-  /* Chladni plate. Stays empty without WebGPU. */
+  /* Chladni plate. Stays empty without WebGPU.
+     Absolute, not fixed, and that is load-bearing: iOS 26 Safari composites real page
+     content behind the status bar and toolbar, but the moment it finds a fixed element
+     near a viewport edge it gives up and paints a flat tint sampled from that element
+     instead. A fixed background is what put solid bars on this page. Absolute resolves
+     against the initial containing block, so this still covers the viewport. */
   #plate {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: -2;
     display: block;
@@ -125,26 +122,9 @@
     pointer-events: none;
   }
 
-  /* Sampled by iOS 26+ Safari for its status bar and toolbar tint: it reads the declared
-     background-color of fixed elements near the viewport edges, and reads CSS only, never
-     rendered pixels. opacity 0 keeps it off the page - Safari parses it regardless, but
-     display:none would drop it. It must be the only fixed element declaring a colour, or
-     the plate and the grain compete for the sample. */
-  #chrome {
-    position: fixed;
-    /* Flush. Bleeding it past the edges was tried and made no difference to the bottom
-       toolbar, so this stays in the configuration where the status bar demonstrably
-       samples it. */
-    inset: 0;
-    z-index: -3;
-    opacity: 0;
-    pointer-events: none;
-    background-color: var(--chrome);
-  }
-
-  /* Tiled SVG noise. Lower opacity in dark mode - light grain lifts black fast. */
+  /* Tiled SVG noise. Absolute for the same reason as the plate. */
   .grain {
-    position: fixed;
+    position: absolute;
     inset: 0;
     height: 100%;
     height: 100lvh;
@@ -210,7 +190,6 @@
 <body>
 
 <canvas id="plate" aria-hidden="true"></canvas>
-<div id="chrome" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
 <h1>Hubert Dworczyński</h1>

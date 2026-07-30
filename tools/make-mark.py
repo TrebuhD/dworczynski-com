@@ -70,8 +70,10 @@ def svg(inner, fill=ACCENT):
 
 
 # Icon radii, and the touch icon scaled down for the margin iOS expects around a glyph.
-ICON = (13, 23)
-TOUCH = (11, 19)
+# A small core with a far-out falloff: the rim dissolves over most of the mark's radius
+# rather than sitting as a thin edge, so the dither is the mark rather than a detail.
+ICON = (9, 25)
+TOUCH = (7, 21)
 
 if "--solid" in sys.argv:
     body = '<circle cx="32" cy="32" r="18"/>'

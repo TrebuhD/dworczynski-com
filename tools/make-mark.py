@@ -1,71 +1,45 @@
 #!/usr/bin/env python3
-"""Emit the D mark as an SVG path, straight from the system font.
+"""Emit the node mark.
 
-The favicon ships as an inline SVG data URI, so the glyph has to be a path - a <text>
-element would render in whatever font the viewer happens to have installed.
+The mark is a single filled circle - a node, the point on a Chladni plate that never
+moves. No typeface, so no font dependency and nothing to convert to outlines.
 
-    pip install fonttools
     python3 tools/make-mark.py           # favicon data URI, paste into <link rel="icon">
     python3 tools/make-mark.py --touch   # SVG source for apple-touch-icon.png
+    python3 tools/make-mark.py --card    # SVG for the OG card, in the card's ink
 
-To change the face, point FONT/FACE at another family and check the result at 16px
-before committing - even stroke weights survive icon sizes, Didone hairlines do not.
+Teal clears 3.9:1 on the light background and 4.5:1 on the dark one, so a single flat
+colour works everywhere and the favicon needs no prefers-color-scheme rule. If the accent
+ever changes, check it against BOTH backgrounds - a colour that only works on one means
+the favicon dies in half of all browsers.
 """
 import sys
 
-from fontTools.misc.transform import Transform
-from fontTools.pens.boundsPen import BoundsPen
-from fontTools.pens.svgPathPen import SVGPathPen
-from fontTools.pens.transformPen import TransformPen
-from fontTools.ttLib import TTCollection
+ACCENT = "#2e8b84"  # teal
+DARK = "#14140f"    # --bg, dark scheme
 
-FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
-FACE = 1  # Helvetica Neue Bold
-GLYPH = "D"
-INK_LIGHT = "#1a1a1a"  # --fg, light scheme: the tab strip is light, so the mark is dark
-INK_DARK = "#e8e5de"   # --fg, dark scheme
-DARK = "#14140f"       # --bg, dark scheme
-
-
-def path(pad, box=64):
-    """Glyph outline scaled to fit a `box`-unit square with `pad` units of margin."""
-    font = TTCollection(FONT).fonts[FACE]
-    glyphs = font.getGlyphSet()
-    glyph = glyphs[GLYPH]
-
-    bounds = BoundsPen(glyphs)
-    glyph.draw(bounds)
-    x0, y0, x1, y1 = bounds.bounds
-    w, h = x1 - x0, y1 - y0
-
-    avail = box - 2 * pad
-    scale = avail / max(w, h)
-    tx = pad + (avail - w * scale) / 2 - x0 * scale
-    ty = pad + (avail - h * scale) / 2 - y0 * scale
-
-    pen = SVGPathPen(glyphs, ntos=lambda v: f"{v:.2f}".rstrip("0").rstrip("."))
-    # Negative y scale: font units grow upward, SVG grows downward.
-    glyph.draw(TransformPen(pen, Transform(scale, 0, 0, -scale, tx, box - ty)))
-    return pen.getCommands()
+# Radii in a 64-unit box. The favicon runs larger because it is never seen bigger than
+# 32px; the touch icon needs the margin iOS expects around an app glyph.
+R_ICON = 18
+R_TOUCH = 15
 
 
 def svg(inner):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">{inner}</svg>'
 
 
+def node(r, fill):
+    return f'<circle cx="32" cy="32" r="{r}" fill="{fill}"/>'
+
+
 if "--touch" in sys.argv:
-    # Opaque on purpose: iOS composites transparency onto black, and applies its own
-    # corner mask, so no rounding here either. Normal icon margin.
-    print(svg(f'<rect width="64" height="64" fill="{DARK}"/>'
-              f'<path fill="{INK_DARK}" d="{path(13)}"/>'))
+    # Opaque on purpose: iOS composites transparency onto black and applies its own
+    # corner mask, so no rounding here.
+    print(svg(f'<rect width="64" height="64" fill="{DARK}"/>{node(R_TOUCH, ACCENT)}'))
+elif "--card" in sys.argv:
+    print(svg(node(R_ICON, ACCENT)))
 else:
-    # The tab strip follows the OS scheme, so the mark has to as well - a light mark
-    # would disappear on a light strip. SVG favicons honour prefers-color-scheme, and
-    # the default fill is the light-scheme ink so a browser that ignores the query
-    # still shows something legible.
-    style = (f"<style>path{{fill:{INK_LIGHT}}}"
-             f"@media(prefers-color-scheme:dark){{path{{fill:{INK_DARK}}}}}</style>")
-    mark = svg(f'{style}<path d="{path(1)}"/>')
+    mark = svg(node(R_ICON, ACCENT))
     encoded = (mark.replace('"', "'").replace("#", "%23")
                    .replace("<", "%3C").replace(">", "%3E"))
     print(f"data:image/svg+xml,{encoded}")

@@ -128,7 +128,11 @@
      the plate and the grain compete for the sample. */
   #chrome {
     position: fixed;
-    inset: 0;
+    /* Bleeds past both edges on purpose. Sitting flush at inset 0 the bottom toolbar
+       never sampled it and fell back to Safari's default light material, dark mode or
+       not - the sampler has to extend past the viewport for the toolbar to take it.
+       Fixed elements are out of flow, so this adds no scrollable area. */
+    inset: -25vh 0;
     z-index: -3;
     opacity: 0;
     pointer-events: none;

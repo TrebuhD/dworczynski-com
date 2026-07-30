@@ -3,10 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hubert Dworczyński</title>
-<meta name="description" content="Hubert Dworczyński - Poznań, Poland.">
+
+<title>Hubert Dworczyński - Software engineer, Poznań</title>
+<meta name="description" content="Hubert Dworczyński is a software engineer based in Poznań, Poland. Links to GitHub, LinkedIn and contact details.">
+<link rel="canonical" href="https://dworczynski.com/">
+
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='monospace'>D</text></svg>">
+<meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14140f" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://dworczynski.com/">
+<meta property="og:title" content="Hubert Dworczyński">
+<meta property="og:description" content="Software engineer based in Poznań, Poland.">
+<meta property="og:image" content="https://dworczynski.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hubert Dworczyński - software engineer, Poznań, Poland.">
+<meta property="og:locale" content="en_GB">
+<meta property="profile:first_name" content="Hubert">
+<meta property="profile:last_name" content="Dworczyński">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c2603a'/%3E%3Cpath fill='%23fbfaf8' fill-rule='evenodd' d='M20 16h12a16 16 0 010 32H20zm7 7v18h5a9 9 0 000-18z'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://dworczynski.com/#hubert",
+  "name": "Hubert Dworczyński",
+  "givenName": "Hubert",
+  "familyName": "Dworczyński",
+  "url": "https://dworczynski.com/",
+  "jobTitle": "Software engineer",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Poznań",
+    "addressCountry": "PL"
+  },
+  "sameAs": [
+    "https://github.com/TrebuhD",
+    "https://www.linkedin.com/in/hubert-dworczynski/"
+  ]
+}
+</script>
+
 <style>
   :root {
     --bg: #fbfaf8;
@@ -14,6 +57,7 @@
     --dim: #7a7670;
     --rule: #e0ddd7;
     --accent: #1a1a1a;
+    --grain-o: 0.26;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -22,24 +66,51 @@
       --dim: #86817a;
       --rule: #2c2b26;
       --accent: #e8e5de;
+      --grain-o: 0.11;
     }
+    body { -webkit-font-smoothing: antialiased; }
   }
 
-  html { -webkit-text-size-adjust: 100%; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--bg);
+  }
 
   body {
-    background: var(--bg);
+    background: transparent;
     color: var(--fg);
-    font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font: 15px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-variant-ligatures: none;
     margin: 0;
     padding: 14vh 7vw 4rem;
     max-width: 34rem;
   }
 
+  /* Chladni plate. Stays empty without WebGPU. */
+  #plate {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* Tiled SVG noise. Lower opacity in dark mode - light grain lifts black fast. */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--grain-o);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  }
+
   h1 {
     font-size: 1.05rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.005em;
     margin: 0;
   }
 
@@ -91,8 +162,11 @@
 </head>
 <body>
 
+<canvas id="plate" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+
 <h1>Hubert Dworczyński</h1>
-<p class="tagline">Poznań, Poland.</p>
+<p class="tagline">Software engineer. Poznań, Poland.</p>
 
 <hr>
 
@@ -103,13 +177,238 @@
 </ul>
 
 <script>
-  // Assembled at runtime so the address isn't sitting in the HTML for scrapers.
+  // Assembled at runtime to keep the address out of the HTML.
   (function () {
     var a = document.getElementById('mail');
     var addr = ['hubert', 'dworczynski.com'].join('@');
     a.href = 'mailto:' + addr;
     a.textContent = addr;
   })();
+</script>
+
+<script type="module">
+// A Chladni plate field, cos(nπx)cos(mπy) - λ·cos(mπx)cos(nπy). Two such terms are
+// superposed and cross-faded by a slowly rotating mix angle, with all four mode numbers
+// drifting continuously - no dwells, no jumps, it never stops morphing.
+//
+// The field is rendered as tone, not as its nodal lines: a 2-level dithered screen over
+// broad soft regions. One of four tone mappings is picked per page load.
+const canvas = document.getElementById('plate');
+if (!navigator.gpu) throw 0;
+
+const adapter = await navigator.gpu.requestAdapter();
+if (!adapter) throw 0;
+const device = await adapter.requestDevice();
+const format = navigator.gpu.getPreferredCanvasFormat();
+const ctx = canvas.getContext('webgpu');
+ctx.configure({ device, format, alphaMode: 'premultiplied' });
+
+const mod = device.createShaderModule({ code: `
+struct U {
+  res: vec2f, a: vec2f, b: vec2f, mix: vec2f, lam: vec2f,
+  opacity: f32, style: f32, gref: f32, warp: f32,
+  thr: f32, nz: f32, grain: f32, amp: f32,
+  ink: vec4f,
+};
+@group(0) @binding(0) var<uniform> u: U;
+
+const PI = 3.14159265;
+const LEVELS = 2.0;   // 1-bit is too coarse; 2 keeps the screen visible but soft
+
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  var p = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  return vec4f(p[i], 0.0, 1.0);
+}
+
+// lam != 1 detunes the two halves. At lam == 1 the term is antisymmetric and vanishes
+// on x == y for every mode, which would nail a static diagonal across the page.
+fn term(p: vec2f, n: f32, m: f32, lam: f32) -> f32 {
+  return cos(n * PI * p.x) * cos(m * PI * p.y) - lam * cos(m * PI * p.x) * cos(n * PI * p.y);
+}
+
+fn hash(c: vec2f) -> f32 {
+  return fract(sin(dot(c, vec2f(127.1, 311.7))) * 43758.5453);
+}
+
+// Interleaved gradient noise - blue-noise-ish dither source from one line.
+fn ign(c: vec2f) -> f32 {
+  return fract(52.9829189 * fract(0.06711056 * c.x + 0.00583715 * c.y));
+}
+
+// Tone to a dithered screen, pinned to the pixel grid so the texture holds still while
+// the field moves. thr keeps ink off the mid-tones: without it the whole viewport takes
+// a half-strength haze that lifts the background and eats text contrast.
+fn screen(L0: f32, cell: vec2f) -> f32 {
+  let L = smoothstep(u.thr, 1.0, clamp(L0, 0.0, 1.0));
+  let d = (ign(cell) - 0.5) / LEVELS;
+  let n = (hash(cell) - 0.5) * u.nz;
+  return clamp(floor((L + d + n) * LEVELS + 0.5) / LEVELS, 0.0, 1.0);
+}
+
+@fragment fn fs(@builtin(position) fc: vec4f) -> @location(0) vec4f {
+  var p = fc.xy / u.res;
+  p.x = p.x * (u.res.x / u.res.y);
+
+  // Two-octave sinusoidal warp, so the field never reads as a clean analytic lattice.
+  p = p + 0.055 * vec2f(sin(p.y * 4.1 + u.warp), cos(p.x * 3.7 - u.warp * 0.8))
+        + 0.020 * vec2f(sin(p.y * 9.3 - u.warp * 1.4), cos(p.x * 8.1 + u.warp * 1.1));
+
+  let v = u.mix.x * term(p, u.a.x, u.a.y, u.lam.x) + u.mix.y * term(p, u.b.x, u.b.y, u.lam.y);
+  let cell = floor(fc.xy / u.grain);
+  var L = 0.0;
+
+  if (u.style < 0.5) {
+    // wash: the signed field, straight to tone
+    L = 0.5 + 0.5 * clamp(v / u.amp, -1.0, 1.0);
+
+  } else if (u.style < 1.5) {
+    // glow: field energy - brightest where the plate swings hardest
+    L = pow(clamp(abs(v) / u.amp, 0.0, 1.0), 1.4);
+
+  } else if (u.style < 2.5) {
+    // lit: field as a height map, light raking across it. Only slopes facing the light
+    // take ink, scaled by steepness - a lambert term would mid-tone every flat region.
+    let gx = dpdx(v); let gy = dpdy(v);
+    let gm = length(vec2f(gx, gy));
+    let ldir = normalize(vec2f(0.62, -0.48));
+    let facing = -(gx * ldir.x + gy * ldir.y) / (gm + 1e-7);
+    L = clamp(facing, 0.0, 1.0) * clamp(gm / (u.gref * 2.2), 0.0, 1.0);
+
+  } else {
+    // poster: wash with the ramp pushed toward separations
+    L = smoothstep(0.15, 0.85, 0.5 + 0.5 * clamp(v / u.amp, -1.0, 1.0));
+  }
+
+  let a = screen(L, cell) * u.opacity;
+  return vec4f(u.ink.rgb * a, a);
+}` });
+
+const pipe = device.createRenderPipeline({
+  layout: 'auto',
+  vertex: { module: mod, entryPoint: 'vs' },
+  fragment: {
+    module: mod, entryPoint: 'fs',
+    targets: [{ format, blend: {
+      color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+      alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+    } }],
+  },
+  primitive: { topology: 'triangle-list' },
+});
+
+const ubuf = device.createBuffer({ size: 96, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+const udata = new Float32Array(24);
+const bind = device.createBindGroup({
+  layout: pipe.getBindGroupLayout(0),
+  entries: [{ binding: 0, resource: { buffer: ubuf } }],
+});
+
+let dpr = 1;
+function resize() {
+  dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.floor(innerWidth * dpr));
+  const h = Math.max(1, Math.floor(innerHeight * dpr));
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+}
+resize();
+addEventListener('resize', resize);
+
+// Master clock. Small number = slow drift; the whole look hangs off this.
+const SPEED = 0.055;
+// Mode numbers stay in roughly 1.5-7. Higher and the field gets busy enough to fight the
+// text, lower and the screen empties out.
+const CENTER = [4.2, 3.6, 4.6, 3.2];
+
+// One tone mapping per page load. ?plate=wash|glow|lit|poster pins it.
+const PLATES = ['wash', 'glow', 'lit', 'poster'];
+const asked = new URLSearchParams(location.search).get('plate');
+const STYLE = PLATES.includes(asked) ? PLATES.indexOf(asked)
+                                     : Math.floor(Math.random() * PLATES.length);
+
+// Per style: ink opacity (dark, light), where the tone ramp starts taking ink, and how
+// much per-dot grain. thr is the real coverage control - raise it to quiet a style down.
+const OPACITY   = [0.11, 0.10, 0.15, 0.10];
+const OPACITY_L = [0.08, 0.07, 0.11, 0.07];
+const THR       = [0.60, 0.52, 0.32, 0.50];
+const NZ        = [0.10, 0.10, 0.06, 0.14];
+
+const dark = matchMedia('(prefers-color-scheme: dark)');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+let hidden = false;
+addEventListener('visibilitychange', () => { hidden = document.hidden; });
+
+// 40fps is indistinguishable from 120 at this speed and cheaper.
+const MIN_DT = 1000 / 40;
+let last = -1e9;
+const t0 = performance.now();
+
+function draw(now) {
+  requestAnimationFrame(draw);
+  if (hidden || now - last < MIN_DT) return;
+  last = now;
+
+  // reduced-motion pins time to one arbitrary but decent-looking frame.
+  const t = (reduced.matches ? 40.0 : (now - t0) / 1000) * SPEED;
+
+  // Incommensurate frequencies, so the four mode numbers never line up twice and the
+  // pattern never repeats. Two octaves each: the slow one carries the shape, the fast
+  // one keeps the field from ever going still.
+  const an = CENTER[0] + 2.2 * Math.sin(t * 0.41) + 0.6 * Math.sin(t * 0.97 + 1.3);
+  const am = CENTER[1] + 1.7 * Math.cos(t * 0.33) + 0.5 * Math.sin(t * 1.13 + 0.4);
+  const bn = CENTER[2] + 1.9 * Math.sin(t * 0.29 + 2.1) + 0.5 * Math.cos(t * 0.83);
+  const bm = CENTER[3] + 1.5 * Math.cos(t * 0.47 + 1.1) + 0.5 * Math.sin(t * 0.71);
+
+  // Rotating superposition. At the poles one term owns the plate, between them the
+  // field is a hybrid - this is what turns a drift into a change of shape.
+  const th = t * 0.53 + 0.7 * Math.sin(t * 0.19);
+  const isDark = dark.matches;
+
+  const lam1 = 1 + 0.35 * Math.sin(t * 0.61 + 0.9);
+  const lam2 = 1 + 0.35 * Math.cos(t * 0.53 + 2.4);
+  const mx = Math.cos(th), my = Math.sin(th);
+
+  udata[0] = canvas.width;
+  udata[1] = canvas.height;
+  udata[2] = an;
+  udata[3] = am;
+  udata[4] = bn;
+  udata[5] = bm;
+  udata[6] = mx;
+  udata[7] = my;
+  udata[8] = lam1;
+  udata[9] = lam2;
+  udata[10] = isDark ? OPACITY[STYLE] : OPACITY_L[STYLE];
+  udata[11] = STYLE;
+  // Mean |gradient| per pixel, for the steepness term in 'lit'.
+  udata[12] = Math.PI * ((an + am + bn + bm) / 4) / canvas.height;
+  udata[13] = t * 0.7;
+  udata[14] = THR[STYLE];
+  udata[15] = NZ[STYLE];
+  udata[16] = 2.0 * dpr;   // dot cell in device px, so it holds ~2 css px on retina
+  // |v| cannot exceed this; half of it spans the interesting part of the tone ramp.
+  udata[17] = 0.55 * (Math.abs(mx) * (1 + lam1) + Math.abs(my) * (1 + lam2));
+  udata[20] = isDark ? 0.91 : 0.10;
+  udata[21] = isDark ? 0.90 : 0.10;
+  udata[22] = isDark ? 0.87 : 0.10;
+  udata[23] = 1;
+  device.queue.writeBuffer(ubuf, 0, udata);
+
+  const enc = device.createCommandEncoder();
+  const pass = enc.beginRenderPass({
+    colorAttachments: [{
+      view: ctx.getCurrentTexture().createView(),
+      clearValue: { r: 0, g: 0, b: 0, a: 0 },
+      loadOp: 'clear', storeOp: 'store',
+    }],
+  });
+  pass.setPipeline(pipe);
+  pass.setBindGroup(0, bind);
+  pass.draw(3);
+  pass.end();
+  device.queue.submit([enc.finish()]);
+}
+requestAnimationFrame(draw);
 </script>
 
 </body>

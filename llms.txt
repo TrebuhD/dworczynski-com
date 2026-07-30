@@ -1,0 +1,16 @@
+# Hubert Dworczyński
+
+> Software engineer based in Poznań, Poland. Personal homepage at https://dworczynski.com/
+
+Hubert Dworczyński is a software engineer living and working in Poznań, Poland.
+"Dworczyński" is also written "Dworczynski" without diacritics.
+
+## Links
+
+- [GitHub](https://github.com/TrebuhD): source repositories, username `TrebuhD`
+- [LinkedIn](https://www.linkedin.com/in/hubert-dworczynski/): professional profile
+
+## Contact
+
+Email is at the `dworczynski.com` domain, local part `hubert`. The address is
+assembled in JavaScript on the homepage rather than published as plain text.

@@ -10,11 +10,11 @@ core with a dithered rim, screened the same way the plate itself is: a 4x4 order
     python3 tools/make-mark.py --card    # SVG for the OG card
     python3 tools/make-mark.py --solid   # undithered, if the dither ever misbehaves
 
-Chartreuse clears 3.2:1 on the light background and 5.1:1 on the dark one, so one flat
+Emerald clears 3.5:1 on the light background and 4.8:1 on the dark one, so one flat
 colour works everywhere and the favicon needs no prefers-color-scheme rule. Check any
 replacement against BOTH backgrounds - a colour that only works on one means the favicon
-dies in half of all browsers. The page's full acid green (#c8f542) fails this test:
-1.1:1 on the light background.
+dies in half of all browsers. The page's dark-scheme mint (#85d9ab) fails this test:
+1.5:1 on the light background.
 
 GRID is 32 on purpose. It divides the 64-unit box evenly, so every coordinate is an
 integer and the path stays short; coarser grids (16) break the circular silhouette and
@@ -22,8 +22,8 @@ the mark goes lopsided at small sizes.
 """
 import sys
 
-ACCENT = "#6b9122"  # chartreuse
-DARK = "#0e120d"    # --bg, dark scheme
+ACCENT = "#3f9166"  # emerald
+DARK = "#0b1712"    # --bg, dark scheme
 BOX = 64
 GRID = 32
 

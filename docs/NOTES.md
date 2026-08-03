@@ -6,6 +6,8 @@ Working knowledge that isn't obvious from the code. Trimmed to constraints that 
 
 Cloudflare Pages, connected to this repo. Build command: none, output directory: `/`. Custom domains `dworczynski.com` and `www.dworczynski.com`; Cloudflare handles TLS.
 
+Everything in the repo deploys, including this file. `_redirects` shadows `docs/`, `tools/` and `README.md` (Pages evaluates redirects before static assets) - without it this file is public and leaks the email address verbatim, defeating the JS assembly on the page. Keep `_redirects` in step with any new non-site files.
+
 ## Email
 
 `hubert@dworczynski.com` forwards to Gmail via Cloudflare Email Routing (set up 2026-07-30). Zone records: three `route*.mx.cloudflare.net` MX records, SPF TXT, DKIM TXT. Verify with `dig +short MX dworczynski.com`.

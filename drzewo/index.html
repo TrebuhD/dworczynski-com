@@ -287,7 +287,7 @@ const EVIDENCE = {
     cite: "Archiwum Państwowe w Łodzi · skan w metryki.genealodzy.pl, id218-sy1917-kt1, plik 001-002", url: "https://metryki.genealodzy.pl/id218-sy1917-kt1", site: "metryki.genealodzy.pl",
     orig: "Stawił się Walenty Kokociński, gospodarz, lat trzydzieści sześć … i Antoniego Żyśko, gospodarza z Pustelnika, lat pięćdziesiąt sześć … z jego małżonki Józefy z Żyśków",
     reading: "Walenty Kokociński, gospodarz z Pustelnika, lat 36, okazuje syna urodzonego 28 grudnia 1916 roku z żony Józefy z Żyśków, lat 28. Dziecku nadano imię Kazimierz. Jednym ze świadków był Antoni Żyśko, gospodarz z Pustelnika, lat 56.",
-    points: ["Późniejsza adnotacja odnotowuje zgon w Śremie 3 marca 2011 roku, co zgadza się z grobem, który dzieli z Anną oraz Danutą i Romanem Szafrańskimi.", "Drugi świadek pochodził z Ostrowa, wsi w tej samej parafii. W drzewie jako miejsce urodzenia Edwarda wpisano „Ostrowo”.", "W 1916 roku w tym samym kościele wzięła ślub Ludwika Żyśko, zapewne siostra Józefy."] },
+    points: ["Późniejsza adnotacja odnotowuje zgon w Śremie 3 marca 2011 roku, co zgadza się z grobem, który dzieli z Anną oraz Danutą i Romanem Szafrańskimi.", "Drugi świadek pochodził z Ostrowa, wsi w tej samej parafii. Edward urodził się jednak w Ostrowie (Ostrowo, nie Ostrów), najpewniej pod Śremem.", "W 1916 roku w tym samym kościele wzięła ślub Ludwika Żyśko, zapewne siostra Józefy."] },
   z1892: { title: "Żeśkowie w Tykadłowie", short: "1892 · Żeśkowie", when: "Tykadłów 1892 · Brzeźnio 1916", img: "img/1892-birth-ludwika-zesko.jpg",
     cap: "Tykadłów, urodzenia 1892, akt nr 20 (po rosyjsku)",
     cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/68, skan 10 · Brzeźnio, małżeństwa 1916, akt 39, metryki.genealodzy.pl id218-sy1916-kt2", url: SWA(11961702), site: "szukajwarchiwach.gov.pl",
@@ -601,7 +601,7 @@ function drawBrz() {
   drawMap("map-brzeznio", 340, 200, { lat0: 51.475, lat1: 51.53, lon0: 18.55, lon1: 18.66, step: 0.025 }, [
     { p: "Pustelnik", c: "confirmed", label: "Pustelnik", sub: "Kazimierz ur. 1916 · gospodarstwo Żyśków", dx: 10, dy: -2 },
     { p: "Brzeźnio", c: "ink", r: 6, label: "Brzeźnio", sub: "kościół parafialny", dx: 10, dy: 6 },
-    { p: "Ostrów", c: "tree", label: "Ostrów", sub: "Edward ur. 1939?", anchor: "end", dx: -9, dy: 4 },
+    { p: "Ostrów", c: "tree", label: "Ostrów", sub: "świadek w 1917", anchor: "end", dx: -9, dy: 4 },
   ]);
 }
 function render() { drawFan(); drawLeaves(); drawGraves(); drawMaps(); drawBrz(); select(window._sel || 8); }

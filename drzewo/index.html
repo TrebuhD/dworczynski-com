@@ -71,7 +71,7 @@ section > header { display: grid; gap: 10px; margin-bottom: 28px; }
 .plate { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
 @media (max-width: 900px) { .plate { grid-template-columns: minmax(0, 1fr); } }
 .fan-box { overflow-x: auto; }
-#fan { width: 100%; min-width: 620px; height: auto; display: block; }
+#fan { width: 100%; min-width: 760px; height: auto; display: block; }
 #fan .seg { stroke: var(--paper); stroke-width: 1.5; cursor: pointer; transition: opacity .15s; }
 #fan .seg:hover, #fan .seg.sel { stroke: var(--ink); stroke-width: 2; }
 #fan text { font-family: var(--font-body); fill: var(--ink); pointer-events: none; }
@@ -173,7 +173,7 @@ footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
 
   <div class="plate">
     <div>
-      <div class="fan-box"><svg id="fan" viewBox="0 0 1000 560" role="img" aria-label="Wykres wachlarzowy przodków Huberta Dworczyńskiego, sześć pokoleń"></svg></div>
+      <div class="fan-box"><svg id="fan" viewBox="0 0 1200 650" role="img" aria-label="Wykres wachlarzowy przodków Huberta Dworczyńskiego, siedem pokoleń"></svg></div>
       <div class="legend" aria-label="Legenda">
         <span><i class="sw confirmed"></i>Potwierdzone skanem aktu</span>
         <span><i class="sw likely"></i>Prawdopodobne, jedno ogniwo do udowodnienia</span>
@@ -296,6 +296,24 @@ const EVIDENCE = {
     points: ["Ojciec chrzestny: Józef Żeśko, lat 28, zapewne brat Antoniego.", "W tej samej parafii Tykadłów w 1893 roku pobrali się Józef Kazimierczak i Antonina Dąbkowska. W latach 90. XIX wieku Kazimierczakowie i Żeśkowie mieszkali w tej samej parafii."],
     extra: { img: "img/1916-marriage-ludwika-zysko.jpg", cap: "Brzeźnio, małżeństwa 1916, akt nr 39", orig: "Ludwiką Żyśko, panną lat dwadzieścia cztery, urodzoną w Tykadłowie … córką żyjących Antoniego i Józefy z Szymczaków",
       reading: "W 1916 roku Ludwika, lat 24, urodzona w Tykadłowie, bierze ślub w Brzeźniu. Mieszka przy rodzicach Antonim i Józefie z Szymczaków w Pustelniku. To łączy Żeśków z Tykadłowa z Żyśkami z Pustelnika." } },
+  b1863: { title: "Akt chrztu Józefa Kazimierczaka", short: "1863 · chrzest", when: "Borków, 4 lutego 1863", img: "img/1863-birth-jozef-kazimierczak.jpg",
+    cap: "Parafia Borków, urodzenia 1863, akt nr 8",
+    cite: "Archiwum Państwowe w Kaliszu, 11/657/0/1/39, skan 5", url: SWA(29541489), site: "szukajwarchiwach.gov.pl",
+    orig: "Stawił się Stanisław Kaźmierczak, wyrobnik lat czterdzieści pięć, w Czartkach zamieszkały … z jego małżonki Katarzyny z Kubiaków lat czterdzieści",
+    reading: "Stanisław Kaźmierczak, wyrobnik z Czartek, lat 45, zgłasza syna urodzonego 3 lutego 1863 roku z żony Katarzyny z Kubiaków, lat 40. Dziecku nadano imię Józef.",
+    points: ["Na marginesie: „Zmarł w Kaliszu dn. 1 marca 1950, USC Kalisz nr 173/50”. Ta sama adnotacja co na akcie ślubu z 1893 roku, więc to na pewno ten sam Józef.", "Drzewo podawało rok 1863. Zgadza się."] },
+  m1879: { title: "Ślub Antoniego Żeśki i Józefy Szymczak", short: "1879 · ślub", when: "Tykadłów, listopad 1879", img: "img/1879-marriage-zesko-szymczak.jpg",
+    cap: "Parafia Tykadłów, małżeństwa 1879, akt nr 9 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/55, skany 17–18 · urodzenia 1857 akt 12 i 1858 akt 5", url: SWA(11961689), site: "szukajwarchiwach.gov.pl",
+    orig: "Антоніемъ Ржеско (Antoni Rzeszko) … сыномъ Вавржинца и Розаліи урожденной Хржановской … Іосифою Шимчакъ (Józefa Szymczak) … дочерью Іосифа и Эльжбеты урожденной Жарнецкой",
+    reading: "Antoni, kawaler, lat 22, urodzony i zamieszkały w Tykadłowie, syn Wawrzyńca i Rozalii z Chrzanowskich. Józefa, panna, lat 21, urodzona w Tykadłowie, córka Józefa i Elżbiety z Żarneckich. Obie rodziny to komornicy.",
+    points: ["Akt chrztu Antoniego: 20 maja 1857, Tykadłów, ojciec Wawrzyniec lat 34, matka Rozalia z Chrzanowskich lat 23.", "Akt chrztu Józefy: 22 lutego 1858, Tykadłów, ojciec Józef Szymczak lat 43, matka Elżbieta z Żarneckich lat 31.", "Nazwisko w aktach: Rześko, Rzeszko, Żeśko, Żyśko. To jedna rodzina."] },
+  b1887: { title: "Akt chrztu Józefy Żeśko (Kokocińskiej)", short: "1887 · chrzest", when: "Tykadłów, 25 marca 1887", img: "img/1887-birth-jozefa-zesko.jpg",
+    cap: "Parafia Tykadłów, urodzenia 1887, akt nr 7 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/63, skan 6", url: SWA(11961697), site: "szukajwarchiwach.gov.pl",
+    orig: "Жесько Антони (Zyśko Antoni), коморникъ … отъ законной его жены Юзефы урожденной Шымчакъ",
+    reading: "Antoni Żeśko, komornik z Tykadłowa, lat 30, zgłasza córkę urodzoną 19 marca 1887 roku z żony Józefy z Szymczaków, lat 25. Dziecku nadano imię Józefa.",
+    points: ["Na marginesie: „zmarła dnia 10.12.1980 … USC Brodnica nr 57/80”. Jaszkowo należy do gminy Brodnica.", "Brat Józefy, Stanisław Ześko, wziął ślub w Brzeźniu w 1917 roku; akt podaje tych samych rodziców."] },
 };
 const GRAVES = [
   { plot: "Cmentarz przykościelny, ul. Ogrodowa", people: [["Kazimierz Dworczyński","1910–1987"],["Władysława Dworczyńska","1919–1994"],["Franciszka Szylderowicz","1893–1977"],["Tadeusz Szylderowicz","1901–1983"]],
@@ -332,20 +350,24 @@ const P = {
      note:"W tym samym grobie leży Karolina Porębska, zapewne matka Marii. Akt urodzenia z 1921 roku jest już jawny."},
   16:{n:"Franciszek Dworczyński",y:"ur. 1878",s:"likely",nw:true,f:[["Urodzony","22 X 1878, Drzonek"],["Ślub","18 X 1901, Międzychód"],["Zawód","robotnik"]],ev:["m1901","b1910"],note:"Na pewno ojciec Kazimierza. Pokazany jako prawdopodobny tylko dlatego, że związek Kazimierza z Wojciechem nie jest jeszcze udowodniony."},
   17:{n:"Katarzyna Walkowiak",y:"ur. 1882",s:"likely",nw:true,f:[["Urodzona","17 X 1882, Pokrzywnica"]],ev:["m1901","b1910"]},
-  20:{n:"Józef Kazimierczak",y:"ok. 1864–1950",s:"confirmed",f:[["Urodzony","ok. 1864, Czartki"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik"]],ev:["m1893","b1911"]},
+  20:{n:"Józef Kazimierczak",y:"1863–1950",s:"confirmed",f:[["Urodzony","3 II 1863, Czartki (parafia Borków)"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik"]],ev:["b1863","m1893","b1911"]},
   21:{n:"Antonina Dąbkowska",y:"ok. 1871–1953",s:"confirmed",f:[["Urodzona","ok. 1871, Russów"],["Zmarła","1953 (drzewo)"]],ev:["m1893","b1911"],note:"W drzewie było „Dąbska”. Oba akty mówią: Dąbkowska."},
   24:{n:"Walenty Kokociński",y:"ur. ok. 1880",s:"confirmed",f:[["Mieszkał","Pustelnik, gospodarz, 1917"],["Zmarł","Jaszkowo (drzewo)"]],ev:["b1917"]},
-  25:{n:"Józefa Żeśko",y:"ur. ok. 1888",s:"confirmed",f:[["Mieszkała","Pustelnik, 1917"],["Zmarła","Jaszkowo (drzewo)"]],ev:["b1917","z1892"],note:"Akt z 1917 roku pisze „Józefa z Żyśków”, lat 28; w 1892 roku rodzinę zapisano jako Żeśko. Ślub z Walentym był przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
+  25:{n:"Józefa Żeśko",y:"1887–1980",s:"confirmed",f:[["Urodzona","19 III 1887, Tykadłów"],["Mieszkała","Pustelnik, 1917"],["Zmarła","10 XII 1980, gmina Brodnica (USC Brodnica 57/1980)"]],ev:["b1887","b1917"],note:"W aktach także Żyśko i Rześko. Ślub z Walentym przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
   32:{n:"Jan Dworczyński",y:"ur. ok. 1844",s:"likely",nw:true,f:[["Ślub","1869, Dolsk"],["Mieszkał","Drzonek, chałupnik"]],ev:["m1901"]},
   33:{n:"Marianna Łagoda",y:"ur. ok. 1843",s:"likely",nw:true,ev:["m1901"]},
   34:{n:"Andrzej Walkowiak",y:"",s:"likely",nw:true,f:[["Mieszkał","Międzychód, owczarz"]],ev:["m1901"]},
   35:{n:"Marianna Juskowiak",y:"",s:"likely",nw:true,ev:["m1901"]},
-  40:{n:"Stanisław Kazimierczak",y:"zm. przed 1893",s:"confirmed",nw:true,ev:["m1893"]},
-  41:{n:"Katarzyna",y:"żyła w 1893",s:"confirmed",nw:true,ev:["m1893"],note:"Nazwisko panieńskie nie jest podane. Może je podać akt zgonu Józefa z 1950 roku."},
+  40:{n:"Stanisław Kazimierczak",y:"ok. 1818 – przed 1893",s:"confirmed",nw:true,f:[["1863","wyrobnik w Czartkach, lat 45"]],ev:["b1863","m1893"]},
+  41:{n:"Katarzyna Kubiak",y:"ok. 1823",s:"confirmed",nw:true,f:[["1863","lat 40, Czartki"],["1893","żyła"]],ev:["b1863","m1893"],note:"Nazwisko panieńskie Kubiak podaje akt chrztu Józefa z 1863 roku."},
   42:{n:"Ludwik Dąbkowski",y:"zm. przed 1893",s:"confirmed",nw:true,f:[["Zawód","komornik"]],ev:["m1893"]},
   43:{n:"Agnieszka Kuk(?)",y:"zm. przed 1893",s:"confirmed",nw:true,ev:["m1893"],note:"Nazwisko panieńskie trudno odczytać w cyrylicy: Kuk albo Kukowa."},
-  50:{n:"Antoni Żeśko",y:"ur. ok. 1858",s:"confirmed",f:[["1892","komornik w Tykadłowie, lat 34"],["1917","gospodarz w Pustelniku, lat 56"],["Później","Tworzykowo; pochowany w Jaszkowie (drzewo)"]],ev:["z1892","b1917"],note:"W 1892 roku zapisany jako Żeśko, w latach 1916–17 jako Żyśko. To, że był ojcem Józefy, jest prawdopodobne, ale nie udowodnione: był świadkiem na chrzcie jej syna w tej samej wsi."},
-  51:{n:"Józefa Szymczak",y:"ur. ok. 1862",s:"confirmed",f:[["1892","lat 30, Tykadłów"],["1916","żyła, Pustelnik"]],ev:["z1892"]},
+  50:{n:"Antoni Żeśko",y:"1857 –",s:"confirmed",f:[["Urodzony","20 V 1857, Tykadłów"],["Ślub","XI 1879, Tykadłów"],["1892","komornik w Tykadłowie"],["1917","gospodarz w Pustelniku"],["Później","Tworzykowo; pochowany w Jaszkowie (drzewo)"]],ev:["m1879","b1887","z1892","b1917"]},
+  51:{n:"Józefa Szymczak",y:"1858 –",s:"confirmed",f:[["Urodzona","22 II 1858, Tykadłów"],["Ślub","XI 1879, Tykadłów"],["1916","żyła, Pustelnik"]],ev:["m1879","b1887","z1892"]},
+  100:{n:"Wawrzyniec Żeśko",y:"ok. 1823",s:"confirmed",nw:true,f:[["1857","komornik w Tykadłowie, lat 34"]],ev:["m1879"]},
+  101:{n:"Rozalia Chrzanowska",y:"ok. 1834",s:"confirmed",nw:true,f:[["1857","lat 23"]],ev:["m1879"]},
+  102:{n:"Józef Szymczak",y:"ok. 1815",s:"confirmed",nw:true,f:[["1858","komornik w Tykadłowie, lat 43"]],ev:["m1879"]},
+  103:{n:"Elżbieta Żarnecka",y:"ok. 1827",s:"confirmed",nw:true,f:[["1858","lat 31"]],ev:["m1879"]},
 };
 
 const GR_EV = { g0: 0, g1: 1, g2: 2, g3: 3 };
@@ -356,8 +378,8 @@ const NS = "http://www.w3.org/2000/svg";
 const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 
 // Fan chart
-const RADII = [0, 72, 152, 232, 312, 405, 500];
-const CX = 500, CY = 520;
+const RADII = [0, 72, 152, 232, 312, 405, 500, 590];
+const CX = 600, CY = 610;
 function arcPath(r0, r1, a0, a1) {
   const p = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
   const large = a1 - a0 > Math.PI ? 1 : 0;
@@ -368,7 +390,7 @@ function arcPath(r0, r1, a0, a1) {
 function fill(s) { return { confirmed: css("--confirmed"), likely: css("--likely"), tree: css("--tree") }[s] || css("--unknown"); }
 function drawFan() {
   const svg = document.getElementById("fan"); svg.innerHTML = "";
-  for (let g = 0; g <= 5; g++) {
+  for (let g = 0; g <= 6; g++) {
     const n = 2 ** g;
     for (let i = 0; i < n; i++) {
       const a = n + i, per = P[a], st = per ? per.s : "unknown";
@@ -398,13 +420,13 @@ function drawFan() {
         const flip = deg < 270;
         const x = CX + rm * Math.cos(mid), y = CY + rm * Math.sin(mid);
         t.setAttribute("transform", `translate(${x},${y}) rotate(${flip ? deg + 180 : deg})`);
-        const sz = g === 4 ? 12 : 10.5;
+        const sz = g === 4 ? 12 : g === 5 ? 10.5 : 9;
         addLines(t, [first, last], [sz, sz], dark, per.y, true);
       }
     }
   }
-  el("text", { x: 20, y: 550, class: "yr", "font-size": 13 }, svg).textContent = "← strona ojca";
-  const r = el("text", { x: 980, y: 550, class: "yr", "font-size": 13, "text-anchor": "end" }, svg); r.textContent = "strona matki →";
+  el("text", { x: 20, y: 640, class: "yr", "font-size": 13 }, svg).textContent = "← strona ojca";
+  const r = el("text", { x: 1180, y: 640, class: "yr", "font-size": 13, "text-anchor": "end" }, svg); r.textContent = "strona matki →";
 }
 function addLines(t, names, sizes, dark, years, compact) {
   const lines = [[names[0], "nm", sizes[0]], [names[1], "nm", sizes[1]]];
@@ -424,7 +446,7 @@ function select(a) {
   document.querySelectorAll("#fan .seg").forEach(s => s.classList.toggle("sel", +s.dataset.a === a));
   const per = P[a], d = document.getElementById("detail");
   const gen = Math.floor(Math.log2(a));
-  const rel = (a % 2 ? ["Hubert","Matka","Babcia","Prababcia","Praprababcia","Prapraprababcia"] : ["Hubert","Ojciec","Dziadek","Pradziadek","Prapradziadek","Praprapradziadek"])[gen];
+  const rel = (a % 2 ? ["Hubert","Matka","Babcia","Prababcia","Praprababcia","Prapraprababcia","Praprapraprababcia"] : ["Hubert","Ojciec","Dziadek","Pradziadek","Prapradziadek","Praprapradziadek","Prapraprapradziadek"])[gen];
   if (!per) {
     d.innerHTML = `<span class="eyebrow">${rel} · dziecko: ${P[Math.floor(a / 2)]?.n || "—"}</span><h3>Jeszcze nieznane</h3><p class="note">Żaden z dotąd przeszukanych indeksów nie wskazuje tej osoby.</p>`;
     return;

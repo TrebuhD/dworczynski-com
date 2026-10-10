@@ -71,7 +71,7 @@ section > header { display: grid; gap: 10px; margin-bottom: 28px; }
 .plate { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
 @media (max-width: 900px) { .plate { grid-template-columns: minmax(0, 1fr); } }
 .fan-box { overflow-x: auto; }
-#fan { width: 100%; min-width: 760px; height: auto; display: block; }
+#fan { width: 100%; min-width: 860px; height: auto; display: block; }
 #fan .seg { stroke: var(--paper); stroke-width: 1.5; cursor: pointer; transition: opacity .15s; }
 #fan .seg:hover, #fan .seg.sel { stroke: var(--ink); stroke-width: 2; }
 #fan text { font-family: var(--font-body); fill: var(--ink); pointer-events: none; }
@@ -173,7 +173,7 @@ footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
 
   <div class="plate">
     <div>
-      <div class="fan-box"><svg id="fan" viewBox="0 0 1200 650" role="img" aria-label="Wykres wachlarzowy przodków Huberta Dworczyńskiego, siedem pokoleń"></svg></div>
+      <div class="fan-box"><svg id="fan" viewBox="-80 -70 1360 720" role="img" aria-label="Wykres wachlarzowy przodków Huberta Dworczyńskiego, osiem pokoleń"></svg></div>
       <div class="legend" aria-label="Legenda">
         <span><i class="sw confirmed"></i>Potwierdzone skanem aktu</span>
         <span><i class="sw likely"></i>Prawdopodobne, jedno ogniwo do udowodnienia</span>
@@ -368,8 +368,8 @@ const P = {
   25:{n:"Józefa Żeśko",y:"1887–1980",s:"confirmed",f:[["Urodzona","19 III 1887, Tykadłów"],["Mieszkała","Pustelnik, 1917"],["Zmarła","10 XII 1980, gmina Brodnica (USC Brodnica 57/1980)"]],ev:["b1887","b1917"],note:"W aktach także Żyśko i Rześko. Ślub z Walentym przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
   32:{n:"Jan Dworczyński",y:"ur. ok. 1844",s:"likely",nw:true,f:[["Ślub","1869, Dolsk"],["Mieszkał","Drzonek, chałupnik"]],ev:["m1901"]},
   33:{n:"Marianna Łagoda",y:"ur. ok. 1843",s:"likely",nw:true,ev:["m1901"]},
-  34:{n:"Andrzej Walkowiak",y:"ur. 1853",s:"likely",nw:true,f:[["Urodzony","17 XI 1853, Jawory (pow. śremski)"],["Ślub","25 VIII 1877, Borek"],["Mieszkał","Pokrzywnica, później Międzychód, owczarz"]],ev:["m1877","m1901"],note:"Syn Franciszka Walkowiaka, chałupnika z Pokrzywnicy, i Józefy z Pawlaków."},
-  35:{n:"Marianna Juskowiak",y:"ur. 1859",s:"likely",nw:true,f:[["Urodzona","6 I 1859, Wziąchowo (pow. krotoszyński)"],["Ślub","25 VIII 1877, Borek"]],ev:["m1877","m1901"],note:"Córka Michała Juskowiaka i Katarzyny z Płonków, z Głoginina."},
+  34:{n:"Andrzej Walkowiak",y:"ur. 1853",s:"confirmed",nw:true,f:[["Urodzony","17 XI 1853, Jawory (pow. śremski)"],["Ślub","25 VIII 1877, Borek"],["Mieszkał","Pokrzywnica, później Międzychód, owczarz"]],ev:["m1877","m1901"],note:"Syn Franciszka Walkowiaka, chałupnika z Pokrzywnicy, i Józefy z Pawlaków."},
+  35:{n:"Marianna Juskowiak",y:"ur. 1859",s:"confirmed",nw:true,f:[["Urodzona","6 I 1859, Wziąchowo (pow. krotoszyński)"],["Ślub","25 VIII 1877, Borek"]],ev:["m1877","m1901"],note:"Córka Michała Juskowiaka i Katarzyny z Płonków, z Głoginina."},
   40:{n:"Stanisław Kazimierczak",y:"ok. 1818 – przed 1893",s:"confirmed",nw:true,f:[["1863","wyrobnik w Czartkach, lat 45"]],ev:["b1863","m1893"]},
   41:{n:"Katarzyna Kubiak",y:"ok. 1823",s:"confirmed",nw:true,f:[["1863","lat 40, Czartki"],["1893","żyła"]],ev:["b1863","m1893"],note:"Nazwisko panieńskie Kubiak podaje akt chrztu Józefa z 1863 roku."},
   42:{n:"Ludwik Dąbkowski",y:"ok. 1845 – przed 1893",s:"confirmed",nw:true,f:[["Urodzony","ok. 1845, Tykadłów"],["Ślub","19 XI 1865, Tykadłów"],["Zawód","komornik"]],ev:["m1865","m1893"],note:"Syn Mateusza i Elżbiety z Gnerowiczów(?) Dąbkowskich, gospodarzy z Tykadłowa."},
@@ -380,6 +380,18 @@ const P = {
   101:{n:"Rozalia Chrzanowska",y:"ok. 1832",s:"confirmed",nw:true,f:[["Urodzona","ok. 1832, Tykadłów"],["Ślub","21 XI 1852, Tykadłów"]],ev:["m1879"],note:"Córka Józefa Chrzanowskiego, komornika z Tykadłowa, i Tekli (zmarłej przed 1852)."},
   102:{n:"Józef Szymczak",y:"ok. 1815",s:"confirmed",nw:true,f:[["1858","komornik w Tykadłowie, lat 43"]],ev:["m1879"]},
   103:{n:"Elżbieta Żarnecka",y:"ok. 1827",s:"confirmed",nw:true,f:[["1858","lat 31"]],ev:["m1879"]},
+  68:{n:"Franciszek Walkowiak",y:"zm. przed 1877",s:"confirmed",nw:true,f:[["Zawód","chałupnik w Pokrzywnicy"]],ev:["m1877"],note:"Ojciec Andrzeja. W 1877 roku już nie żył."},
+  69:{n:"Józefa Pawlak",y:"żyła 1877",s:"confirmed",nw:true,f:[["1877","Pokrzywnica"]],ev:["m1877"],note:"Matka Andrzeja Walkowiaka."},
+  70:{n:"Michał Juskowiak",y:"żył 1877",s:"confirmed",nw:true,f:[["1877","Głoginin"]],ev:["m1877"],note:"Ojciec Marianny."},
+  71:{n:"Katarzyna Płonka",y:"żyła 1877",s:"confirmed",nw:true,f:[["1877","Głoginin"]],ev:["m1877"],note:"Matka Marianny Juskowiak."},
+  84:{n:"Mateusz Dąbkowski",y:"żył 1865",s:"confirmed",nw:true,f:[["1865","gospodarz w Tykadłowie"]],ev:["m1865"],note:"Ojciec Ludwika."},
+  85:{n:"Elżbieta Gnerowicz(?)",y:"żyła 1865",s:"confirmed",nw:true,f:[["1865","Tykadłów"]],ev:["m1865"],note:"Matka Ludwika Dąbkowskiego. Nazwisko panieńskie trudne do odczytania."},
+  86:{n:"Wojciech Kurz(?)",y:"zm. przed 1865",s:"confirmed",nw:true,f:[["Mieszkał","Russów"]],ev:["m1865"],note:"Ojciec Agnieszki. Nazwisko trudne do odczytania."},
+  87:{n:"Maryanna",y:"zm. przed 1865",s:"confirmed",nw:true,f:[["Mieszkała","Russów"]],ev:["m1865"],note:"Matka Agnieszki. Nazwisko panieńskie nieczytelne."},
+  200:{n:"Joachim Rześko",y:"zm. przed 1852",s:"confirmed",nw:true,f:[["Mieszkał","Tykadłów (?)"]],note:"Ojciec Wawrzyńca, wymieniony w akcie ślubu syna (Tykadłów 1852, akt 15). W 1852 roku już nie żył. W starszych aktach nazwisko pisano Rześko, później Żeśko i Żyśko."},
+  201:{n:"Maryanna",y:"zm. przed 1852",s:"confirmed",nw:true,f:[],note:"Matka Wawrzyńca Rześki (Tykadłów 1852, akt 15). Nazwiska panieńskiego akt nie podaje."},
+  202:{n:"Józef Chrzanowski",y:"żył 1852",s:"confirmed",nw:true,f:[["1852","komornik w Tykadłowie"]],note:"Ojciec Rozalii (Tykadłów 1852, akt 15)."},
+  203:{n:"Tekla",y:"zm. przed 1852",s:"confirmed",nw:true,f:[],note:"Matka Rozalii Chrzanowskiej (Tykadłów 1852, akt 15). Nazwiska panieńskiego akt nie podaje."},
 };
 
 const GR_EV = { g0: 0, g1: 1, g2: 2, g3: 3 };
@@ -390,7 +402,7 @@ const NS = "http://www.w3.org/2000/svg";
 const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 
 // Fan chart
-const RADII = [0, 72, 152, 232, 312, 405, 500, 590];
+const RADII = [0, 72, 152, 232, 312, 405, 500, 590, 670];
 const CX = 600, CY = 610;
 function arcPath(r0, r1, a0, a1) {
   const p = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
@@ -402,7 +414,7 @@ function arcPath(r0, r1, a0, a1) {
 function fill(s) { return { confirmed: css("--confirmed"), likely: css("--likely"), tree: css("--tree") }[s] || css("--unknown"); }
 function drawFan() {
   const svg = document.getElementById("fan"); svg.innerHTML = "";
-  for (let g = 0; g <= 6; g++) {
+  for (let g = 0; g <= 7; g++) {
     const n = 2 ** g;
     for (let i = 0; i < n; i++) {
       const a = n + i, per = P[a], st = per ? per.s : "unknown";
@@ -432,13 +444,14 @@ function drawFan() {
         const flip = deg < 270;
         const x = CX + rm * Math.cos(mid), y = CY + rm * Math.sin(mid);
         t.setAttribute("transform", `translate(${x},${y}) rotate(${flip ? deg + 180 : deg})`);
+        if (g === 7) { const ts = el("tspan", { x: 0, y: 3, class: "nm" + (dark ? " on-dark" : ""), "font-size": 8.5 }, t); ts.textContent = per.n; continue; }
         const sz = g === 4 ? 12 : g === 5 ? 10.5 : 9;
         addLines(t, [first, last], [sz, sz], dark, per.y, true);
       }
     }
   }
-  el("text", { x: 20, y: 640, class: "yr", "font-size": 13 }, svg).textContent = "← strona ojca";
-  const r = el("text", { x: 1180, y: 640, class: "yr", "font-size": 13, "text-anchor": "end" }, svg); r.textContent = "strona matki →";
+  el("text", { x: -60, y: 640, class: "yr", "font-size": 13 }, svg).textContent = "← strona ojca";
+  const r = el("text", { x: 1260, y: 640, class: "yr", "font-size": 13, "text-anchor": "end" }, svg); r.textContent = "strona matki →";
 }
 function addLines(t, names, sizes, dark, years, compact) {
   const lines = [[names[0], "nm", sizes[0]], [names[1], "nm", sizes[1]]];
@@ -458,7 +471,7 @@ function select(a) {
   document.querySelectorAll("#fan .seg").forEach(s => s.classList.toggle("sel", +s.dataset.a === a));
   const per = P[a], d = document.getElementById("detail");
   const gen = Math.floor(Math.log2(a));
-  const rel = (a % 2 ? ["Hubert","Matka","Babcia","Prababcia","Praprababcia","Prapraprababcia","Praprapraprababcia"] : ["Hubert","Ojciec","Dziadek","Pradziadek","Prapradziadek","Praprapradziadek","Prapraprapradziadek"])[gen];
+  const rel = (a % 2 ? ["Hubert","Matka","Babcia","Prababcia","Praprababcia","Prapraprababcia","Praprapraprababcia","Prapraprapraprababcia"] : ["Hubert","Ojciec","Dziadek","Pradziadek","Prapradziadek","Praprapradziadek","Prapraprapradziadek","Praprapraprapradziadek"])[gen];
   if (!per) {
     d.innerHTML = `<span class="eyebrow">${rel} · dziecko: ${P[Math.floor(a / 2)]?.n || "—"}</span><h3>Jeszcze nieznane</h3><p class="note">Żaden z dotąd przeszukanych indeksów nie wskazuje tej osoby.</p>`;
     return;

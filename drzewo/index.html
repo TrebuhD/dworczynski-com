@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Korzenie Dworczyńskich</title>
+<meta name="description" content="Przodkowie Huberta Dworczyńskiego w polskich archiwach: wykres pokoleń, odczytane akty, groby w Śremie i mapy trzech stron rodzinnych.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 28a14 14 0 0 1 28 0z' fill='%235a4691'/%3E%3Cpath d='M9 28a7 7 0 0 1 14 0z' fill='%232e6b4f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+/* Layout: a register ledger. Fan chart as the opening plate, then evidence leaves, then two maps, then the to-do slip. */
+:root {
+  --paper: #eceee8;        /* ledger paper, grey-green */
+  --leaf: #f6f7f3;         /* raised leaf */
+  --ink: #23211d;          /* iron-gall ink */
+  --ink-soft: #5c5a53;
+  --rule: #cfd2c8;
+  --stamp: #5a4691;        /* archive stamp violet, the accent */
+  --confirmed: #2e6b4f;
+  --likely: #a86f12;
+  --tree: #7d8590;
+  --unknown: #e3e5de;
+  --seg-text: #ffffff;
+  --font-display: "Libre Caslon Display", "Libre Caslon Text", Georgia, serif;
+  --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16181b; --leaf: #1f2226; --ink: #e7e4dc; --ink-soft: #a7a49b; --rule: #33373c;
+    --stamp: #ab98e6; --confirmed: #6cc196; --likely: #e3b25a; --tree: #8f98a3; --unknown: #262a2f; --seg-text: #15171a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16181b; --leaf: #1f2226; --ink: #e7e4dc; --ink-soft: #a7a49b; --rule: #33373c;
+  --stamp: #ab98e6; --confirmed: #6cc196; --likely: #e3b25a; --tree: #8f98a3; --unknown: #262a2f; --seg-text: #15171a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 5vw, 3.6rem); line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); line-height: 1.1; }
+h3 { font-size: 1.35rem; line-height: 1.2; }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--stamp); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--stamp); outline-offset: 3px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+.soft { color: var(--ink-soft); }
+section { padding-block: 56px 8px; border-top: 1px solid var(--rule); margin-top: 56px; }
+section > header { display: grid; gap: 10px; margin-bottom: 28px; }
+
+/* Masthead */
+.mast { display: grid; gap: 14px; margin-bottom: 26px; }
+.mast .surnames { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--stamp); }
+.mast p { font-size: 1.12rem; color: var(--ink-soft); }
+
+/* Chart plate */
+.plate { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
+@media (max-width: 900px) { .plate { grid-template-columns: minmax(0, 1fr); } }
+.fan-box { overflow-x: auto; }
+#fan { width: 100%; min-width: 620px; height: auto; display: block; }
+#fan .seg { stroke: var(--paper); stroke-width: 1.5; cursor: pointer; transition: opacity .15s; }
+#fan .seg:hover, #fan .seg.sel { stroke: var(--ink); stroke-width: 2; }
+#fan text { font-family: var(--font-body); fill: var(--ink); pointer-events: none; }
+#fan .nm { font-weight: 500; }
+#fan .yr { fill: var(--ink-soft); font-family: var(--font-mono); }
+#fan .on-dark { fill: var(--seg-text); }
+#fan .yr.on-dark { fill: var(--seg-text); opacity: .82; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 0.9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 1px solid var(--rule); }
+.sw.confirmed { background: var(--confirmed); border-color: var(--confirmed); }
+.sw.likely { background: var(--likely); border-color: var(--likely); }
+.sw.tree { background: var(--tree); border-color: var(--tree); }
+.sw.unknown { background: var(--unknown); }
+.sw.new { background: transparent; border: 2px solid var(--stamp); border-radius: 50%; }
+
+/* Detail card */
+.detail { background: var(--leaf); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+@media (max-width: 900px) { .detail { position: static; } }
+.detail h3 { font-size: 1.55rem; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; border: 1px solid currentColor; width: fit-content; }
+.chip.confirmed { color: var(--confirmed); } .chip.likely { color: var(--likely); } .chip.tree { color: var(--tree); } .chip.unknown { color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip.new { color: var(--stamp); }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; font-size: 0.95rem; margin: 0; }
+.facts dt { color: var(--ink-soft); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: .08em; padding-top: 4px; }
+.facts dd { margin: 0; }
+.detail .note { font-size: 0.95rem; color: var(--ink-soft); }
+.detail .ev { display: flex; flex-wrap: wrap; gap: 6px; }
+.detail .ev a { font-family: var(--font-mono); font-size: 0.75rem; text-decoration: none; border: 1px solid var(--rule); padding: 3px 8px; border-radius: 4px; color: var(--ink); }
+.detail .ev a:hover { border-color: var(--stamp); color: var(--stamp); }
+
+/* Findings strip */
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0; border-block: 1px solid var(--rule); margin-top: 36px; }
+.finding { padding: 18px 18px 18px 0; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.finding + .finding { padding-left: 18px; border-left: 1px solid var(--rule); }
+@media (max-width: 760px) { .finding + .finding { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); } }
+.finding .big { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.1; }
+.finding p { font-size: 0.95rem; color: var(--ink-soft); }
+
+/* Evidence leaves */
+.leaves { display: grid; gap: 40px; }
+.leaf { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; scroll-margin-top: 20px; }
+@media (max-width: 860px) { .leaf { grid-template-columns: minmax(0, 1fr); } }
+.leaf figure { margin: 0; display: grid; gap: 10px; }
+.leaf img { width: 100%; border-radius: 4px; border: 1px solid var(--rule); background: var(--leaf); display: block; }
+.leaf figcaption { font-size: 0.85rem; color: var(--ink-soft); }
+.leaf .body { display: grid; gap: 14px; min-width: 0; }
+.leaf .cite { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft); line-height: 1.5; overflow-wrap: anywhere; }
+.reading { border-left: 3px solid var(--stamp); padding: 4px 0 4px 16px; display: grid; gap: 6px; }
+.reading .orig { font-family: var(--font-mono); font-size: 0.82rem; color: var(--stamp); }
+.reading p { font-size: 1rem; }
+.leaf ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.leaf li { max-width: 62ch; }
+
+/* Graves table */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--leaf); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; min-width: 640px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td .yrs { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+
+/* Maps */
+.maps { display: grid; gap: 20px; }
+.map-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; align-items: start; }
+.routes { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 0.9rem; color: var(--ink-soft); }
+.routes span { display: inline-flex; align-items: center; gap: 8px; }
+.routes i { width: 26px; border-top: 2px dashed var(--stamp); display: inline-block; }
+.map-card { background: var(--leaf); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
+.map-card svg { width: 100%; height: auto; display: block; }
+.map-card .eyebrow { margin: 0; }
+svg .lbl { font-family: var(--font-body); font-size: 13px; fill: var(--ink); }
+svg .lbl.small { font-size: 11.5px; fill: var(--ink-soft); }
+svg .lbl.big { font-family: var(--font-display); font-size: 19px; }
+svg .halo { fill: var(--stamp); opacity: 0.08; }
+svg .grid { stroke: var(--rule); stroke-width: 1; }
+svg .route { fill: none; stroke: var(--stamp); stroke-width: 2; stroke-dasharray: 6 5; }
+svg .dot { stroke: var(--leaf); stroke-width: 2; }
+
+/* Next steps */
+.todo { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; counter-reset: t; border-top: 1px solid var(--rule); }
+.todo li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--rule); counter-increment: t; }
+.todo li::before { content: counter(t); font-family: var(--font-display); font-size: 1.6rem; color: var(--stamp); line-height: 1; }
+.todo .what { font-weight: 500; }
+.todo .why { color: var(--ink-soft); font-size: 0.95rem; }
+@media (max-width: 760px) { .todo li { grid-template-columns: 2rem minmax(0, 1fr); } .todo .why { grid-column: 2; } }
+footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule); color: var(--ink-soft); font-size: 0.9rem; display: grid; gap: 8px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="surnames">Dworczyński · Kazimierczak · Kokociński · Rychlewicz</div>
+    <h1>Cztery linie, trzy strony rodzinne</h1>
+    <p>Co mówią archiwa w Poznaniu, Kaliszu i Łodzi o pradziadkach Huberta i pokoleniach przed nimi. Każde kolorowe imię poniżej opiera się na zapisie w księgach. Kliknij je, żeby zobaczyć, na którym.</p>
+  </header>
+
+  <div class="plate">
+    <div>
+      <div class="fan-box"><svg id="fan" viewBox="0 0 1000 560" role="img" aria-label="Wykres wachlarzowy przodków Huberta Dworczyńskiego, sześć pokoleń"></svg></div>
+      <div class="legend" aria-label="Legenda">
+        <span><i class="sw confirmed"></i>Potwierdzone skanem aktu</span>
+        <span><i class="sw likely"></i>Prawdopodobne, jedno ogniwo do udowodnienia</span>
+        <span><i class="sw tree"></i>Z drzewa rodzinnego, niesprawdzone</span>
+        <span><i class="sw unknown"></i>Nieznane</span>
+        <span><i class="sw new"></i>Nowe w drzewie</span>
+      </div>
+    </div>
+    <aside class="detail" id="detail" aria-live="polite"></aside>
+  </div>
+
+  <div class="findings">
+    <div class="finding"><span class="eyebrow">Dworczyńscy</span><span class="big">Ślub 19 kwietnia 1941</span><p>Adnotacja na akcie urodzenia Kazimierza z 1910 roku wskazuje akt małżeństwa nr 44/1941 w Śremie, dziesięć miesięcy przed narodzinami Wojciecha.</p></div>
+    <div class="finding"><span class="eyebrow">Kazimierczakowie</span><span class="big">Antonina z Dąbkowskich</span><p>Nie Dąbska. Akt chrztu syna Stefana z 1911 roku i akt jej ślubu z 1893 roku mówią zgodnie: „z Dąbkowskich”.</p></div>
+    <div class="finding"><span class="eyebrow">Kokocińscy · Żeśkowie</span><span class="big">Z Tykadłowa do Pustelnika</span><p>Antoni Żeśko i Józefa z Szymczaków mieszkali w 1892 roku w Tykadłowie, potem w Pustelniku pod Sieradzem. Tam w 1916 roku urodził się Kazimierz Kokociński.</p></div>
+    <div class="finding"><span class="eyebrow">Wciąż otwarte</span><span class="big">Władysława z domu ?</span><p>Odpowiedź leży w jednym dokumencie w USC w Śremie. Najmocniejszy trop to Szylderowicz.</p></div>
+  </div>
+
+  <section id="evidence">
+    <header>
+      <span class="eyebrow">Akty</span>
+      <h2>Co naprawdę mówią skany</h2>
+      <p class="soft">Każdy z tych aktów został odczytany ze skanu udostępnionego przez archiwum. Wpisy niemieckie pochodzą z pruskiego urzędu stanu cywilnego, rosyjskie i polskie z ksiąg parafialnych Królestwa Polskiego.</p>
+    </header>
+    <div class="leaves" id="leaves"></div>
+  </section>
+
+  <section id="graves">
+    <header>
+      <span class="eyebrow">Nagrobki · odczyty z BillionGraves</span>
+      <h2>Kto leży razem w Śremie</h2>
+      <p class="soft">Wspólny grób to mocna wskazówka, a nie dowód. W każdym z tych czterech grobów leży ktoś, kto już jest w drzewie rodzinnym, i właśnie to wiąże te pary z naszą rodziną.</p>
+    </header>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Grób</th><th>Pochowani razem</th><th>Co z tego wynika</th></tr></thead>
+      <tbody id="grave-rows"></tbody>
+    </table></div>
+  </section>
+
+  <section id="places">
+    <header>
+      <span class="eyebrow">Gdzie skupiają się akty</span>
+      <h2>Trzy strony rodzinne, jeden Śrem</h2>
+      <p class="soft">Dworczyńscy nigdy nie wyszli poza dziesięciokilometrowy krąg wokół Śremu. Kazimierczakowie, Dąbkowscy i Żeśkowie mieszkali w latach 90. XIX wieku w tych samych wioskach na północny wschód od Kalisza, w zaborze rosyjskim. Żeśkowie i Kokocińscy przenieśli się potem do Pustelnika pod Sieradzem. W latach 40. wszystkie cztery pary mieszkały już w Śremie.</p>
+    </header>
+    <div class="maps">
+      <div class="map-card"><p class="eyebrow">Przegląd</p><svg id="map-main" viewBox="0 0 760 470" role="img" aria-label="Mapa z trzema skupiskami: Śrem, Kalisz i Brzeźnio"></svg>
+        <div class="routes"><span><i></i>Stefan Kazimierczak: ur. w Dobrzecu 1911, zm. w Śremie 2003</span><span><i></i>Kazimierz Kokociński: ur. w Pustelniku 1916, zm. w Śremie 2011</span></div></div>
+      <div class="map-stack">
+        <div class="map-card"><p class="eyebrow">Okolice Śremu · Dworczyńscy, Walkowiakowie</p><svg id="map-srem" viewBox="0 0 340 250" role="img" aria-label="Mapa okolic Śremu"></svg></div>
+        <div class="map-card"><p class="eyebrow">Na północny wschód od Kalisza · Kazimierczak, Dąbkowski, Żeśko</p><svg id="map-kalisz" viewBox="0 0 340 250" role="img" aria-label="Mapa okolic Kalisza"></svg></div>
+        <div class="map-card"><p class="eyebrow">Parafia Brzeźnio · Kokociński, Żyśko</p><svg id="map-brzeznio" viewBox="0 0 340 200" role="img" aria-label="Mapa parafii Brzeźnio"></svg></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="next">
+    <header>
+      <span class="eyebrow">Do zrobienia</span>
+      <h2>Co zamówić w następnej kolejności</h2>
+      <p class="soft">Według wartości. Jako wnuk lub prawnuk masz prawo do odpisu zupełnego aktu z urzędu stanu cywilnego.</p>
+    </header>
+    <ol class="todo">
+      <li><div class="what">USC Śrem: akt małżeństwa nr 44/1941</div><div class="why">Kazimierz Dworczyński i Władysława. Poda jej nazwisko panieńskie, datę i miejsce urodzenia oraz rodziców. Archiwum Państwowe w Poznaniu nie ma ksiąg z 1941 roku.</div></li>
+      <li><div class="what">USC Śrem: akt urodzenia Wojciecha, 25 lutego 1942</div><div class="why">Wymienia oboje rodziców z nazwiskiem panieńskim matki. Niezależnie potwierdzi, że ojcem był Kazimierz.</div></li>
+      <li><div class="what">Wizyta na cmentarzu przykościelnym, ul. Ogrodowa</div><div class="why">Na nagrobku Dworczyńskich może być napisane „z d. …” przy Władysławie. Za darmo i być może najszybciej.</div></li>
+      <li><div class="what">Archiwum w Sieradzu: księgi parafii Brzeźnio sprzed 1915</div><div class="why">Ślub Walentego Kokocińskiego z Józefą Żyśko i jej urodzenie około 1888 roku. Potwierdzi, że jej rodzicami byli Antoni i Józefa z Szymczaków.</div></li>
+      <li><div class="what">USC Kalisz: akt zgonu nr 173/1950, Józef Kazimierczak</div><div class="why">Powinien podać nazwisko panieńskie jego matki, jedyną lukę w linii Kazimierczaków.</div></li>
+    </ol>
+  </section>
+
+  <footer>
+    <span>Opracowano 10 października 2026 na podstawie Geneteki, Poznan Project, BaSIA, szukajwarchiwach.gov.pl, metryki.genealodzy.pl, grobonet i BillionGraves. Pełny dziennik wyszukiwań, kandydaci i plik GEDCOM są w folderze z badaniami.</span>
+    <span>Osoby żyjące są pokazane tylko z rokiem urodzenia.</span>
+  </footer>
+</div>
+
+<script>
+const SWA = id => `https://www.szukajwarchiwach.gov.pl/jednostka/-/jednostka/${id}`;
+const EVIDENCE = {
+  b1910: { title: "Akt urodzenia Kazimierza Dworczyńskiego", short: "1910 · urodzenie", when: "Międzychód, 17 grudnia 1910", img: "img/1910-birth-kazimierz.jpg",
+    cap: "USC Międzychód (powiat śremski), Geburts-Haupt-Register, nr 37/1910",
+    cite: "Archiwum Państwowe w Poznaniu, 53/1896/0/1/190, skan 127", url: SWA(2244081), site: "szukajwarchiwach.gov.pl",
+    orig: "der Arbeiter Franz (Franciszek) Dworczynski … Katharina (Katarzyna) Dworczyńska, geborene Walkowiak … Kasimir (Kazimierz)",
+    reading: "Robotnik Franciszek Dworczyński z Międzychodu zgłasza, że jego żona Katarzyna z domu Walkowiak urodziła w domu 17 grudnia 1910 roku o czwartej rano syna, któremu nadano imię Kazimierz.",
+    points: ["Podpisał ojciec: „Franciszek Dworczyński”.", "To jedyny Kazimierz Dworczyński w indeksach urodzeń całej Wielkopolski z lat 1769–1912."],
+    extra: { img: "img/1910-margin-1941-marriage.jpg", cap: "Pieczątka na marginesie (obrócona)", orig: "Die Ehe geschl. am 19.4.41 in Schrimm · Standesamt Schrimm Nr. 44/1941",
+      reading: "Związek małżeński zawarty 19 kwietnia 1941 roku w Śremie, akt USC nr 44/1941. Wojciech urodził się w Śremie 25 lutego 1942 roku." } },
+  m1901: { title: "Ślub Franciszka Dworczyńskiego i Katarzyny Walkowiak", short: "1901 · ślub", when: "Międzychód, 18 października 1901", img: "img/1901-marriage-dworczynski-walkowiak.jpg",
+    cap: "USC Międzychód (powiat śremski), księga małżeństw, nr 3/1901",
+    cite: "Archiwum Państwowe w Poznaniu, jednostka 1404673, skan 30", url: SWA(1404673), site: "szukajwarchiwach.gov.pl",
+    orig: "Sohn des Häuslers Johann (Jan) Dworczynski und dessen Ehefrau Marie, geborene Łagoda",
+    reading: "Rodzice Kazimierza. Franciszek, robotnik, urodzony 22 października 1878 w Drzonku; Katarzyna urodzona 17 października 1882 w Pokrzywnicy.",
+    points: ["Rodzice pana młodego: Jan Dworczyński, chałupnik z Drzonka, i Marianna z Łagodów.", "Rodzice panny młodej: Andrzej Walkowiak, owczarz z Międzychodu, i Marianna z Juskowiaków.", "Jan i Marianna wzięli ślub w parafii Dolsk w 1869 roku (indeks Poznan Project)."] },
+  b1911: { title: "Akt chrztu Stefana Kazimierczaka", short: "1911 · chrzest", when: "Dobrzec pod Kaliszem, 28 sierpnia 1911", img: "img/1911-birth-stefan.jpg",
+    cap: "Parafia św. Michała w Dobrzecu, akt urodzenia nr 121/1911 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/674/0/-/41, skan 65", url: SWA(11948291), site: "szukajwarchiwach.gov.pl",
+    orig: "Иосифъ Казимерчакъ (Józef Kazimierczak) … Антонины урожденной Домбковской (z Antoniny z Dąbkowskich)",
+    reading: "Józef Kazimierczak, wyrobnik, lat 48, okazuje syna urodzonego 15/28 sierpnia 1911 roku z żony Antoniny z Dąbkowskich, lat 40. Dziecku nadano imię Stefan.",
+    points: ["Chrzestni: Daniel(?) Dąbkowski i Łucja Kazimierczak.", "Pięcioro rodzeństwa z tej samej pary zgadza się z drzewem: Władysław 1905, Marianna 1909, Kazimierz 1913, Jadwiga 1915. Szósty, Antoni (1907), nie jest w drzewie."] },
+  m1893: { title: "Ślub Józefa Kazimierczaka i Antoniny Dąbkowskiej", short: "1893 · ślub", when: "Tykadłów, 22 stycznia 1893", img: "img/1893-marriage-kazimierczak-dabkowska.jpg",
+    cap: "Parafia Tykadłów, księga z 1893 roku, akt małżeństwa nr 2 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/69, skan 19", url: SWA(11961703), site: "szukajwarchiwach.gov.pl",
+    orig: "Іосифомъ Казимерчакомъ (Józefem Kazimierczakiem) вдовцомъ … Антониною Домбковскою (Antoniną Dąbkowską) девицею",
+    reading: "Józef, wdowiec, lat 28, urodzony w Czartkach, zamieszkały w Borkowie, syn zmarłego Stanisława i żyjącej Katarzyny. Antonina, panna, lat 22, służąca, urodzona i zamieszkała w Russowie, córka zmarłych Ludwika i Agnieszki z Kuków(?), komorników.",
+    points: ["Akt powyżej to ślub jej siostry Marianny Dąbkowskiej, tych samych rodziców.", "Józef był w 1893 roku już wdowcem, więc miał wcześniej inną żonę."],
+    extra: { img: "img/1893-margin-1950-death.jpg", cap: "Adnotacja dopisana na marginesie w 1950 roku", orig: "Zmarł Józef dnia 1.III.50 w Kaliszu · Nr 173/50",
+      reading: "Józef zmarł 1 marca 1950 roku w Kaliszu, akt zgonu nr 173/1950. W drzewie był rok 1950." } },
+  b1917: { title: "Akt chrztu Kazimierza Kokocińskiego", short: "1917 · chrzest", when: "Brzeźnio, 1 stycznia 1917", img: "img/1917-birth-kazimierz-kokocinski.jpg",
+    cap: "Parafia Brzeźnio, powiat sieradzki, urodzenia 1917, akt nr 2",
+    cite: "Archiwum Państwowe w Łodzi · skan w metryki.genealodzy.pl, id218-sy1917-kt1, plik 001-002", url: "https://metryki.genealodzy.pl/id218-sy1917-kt1", site: "metryki.genealodzy.pl",
+    orig: "Stawił się Walenty Kokociński, gospodarz, lat trzydzieści sześć … i Antoniego Żyśko, gospodarza z Pustelnika, lat pięćdziesiąt sześć … z jego małżonki Józefy z Żyśków",
+    reading: "Walenty Kokociński, gospodarz z Pustelnika, lat 36, okazuje syna urodzonego 28 grudnia 1916 roku z żony Józefy z Żyśków, lat 28. Dziecku nadano imię Kazimierz. Jednym ze świadków był Antoni Żyśko, gospodarz z Pustelnika, lat 56.",
+    points: ["Późniejsza adnotacja odnotowuje zgon w Śremie 3 marca 2011 roku, co zgadza się z grobem, który dzieli z Anną oraz Danutą i Romanem Szafrańskimi.", "Drugi świadek pochodził z Ostrowa, wsi w tej samej parafii. W drzewie jako miejsce urodzenia Edwarda wpisano „Ostrowo”.", "W 1916 roku w tym samym kościele wzięła ślub Ludwika Żyśko, zapewne siostra Józefy."] },
+  z1892: { title: "Żeśkowie w Tykadłowie", short: "1892 · Żeśkowie", when: "Tykadłów 1892 · Brzeźnio 1916", img: "img/1892-birth-ludwika-zesko.jpg",
+    cap: "Tykadłów, urodzenia 1892, akt nr 20 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/68, skan 10 · Brzeźnio, małżeństwa 1916, akt 39, metryki.genealodzy.pl id218-sy1916-kt2", url: SWA(11961702), site: "szukajwarchiwach.gov.pl",
+    orig: "Антоній Жесько (Antoni Żeśko), коморникъ изъ Тыкадлова … Іосифы урожденной Шимчаковой (Józefy z Szymczaków)",
+    reading: "W lipcu 1892 roku Antoni Żeśko, komornik z Tykadłowa, lat 34, zgłasza córkę Ludwikę urodzoną z żony Józefy z Szymczaków, lat 30. To dokładnie ci dziadkowie, którzy są w drzewie.",
+    points: ["Ojciec chrzestny: Józef Żeśko, lat 28, zapewne brat Antoniego.", "W tej samej parafii Tykadłów w 1893 roku pobrali się Józef Kazimierczak i Antonina Dąbkowska. W latach 90. XIX wieku Kazimierczakowie i Żeśkowie mieszkali w tej samej parafii."],
+    extra: { img: "img/1916-marriage-ludwika-zysko.jpg", cap: "Brzeźnio, małżeństwa 1916, akt nr 39", orig: "Ludwiką Żyśko, panną lat dwadzieścia cztery, urodzoną w Tykadłowie … córką żyjących Antoniego i Józefy z Szymczaków",
+      reading: "W 1916 roku Ludwika, lat 24, urodzona w Tykadłowie, bierze ślub w Brzeźniu. Mieszka przy rodzicach Antonim i Józefie z Szymczaków w Pustelniku. To łączy Żeśków z Tykadłowa z Żyśkami z Pustelnika." } },
+};
+const GRAVES = [
+  { plot: "Cmentarz przykościelny, ul. Ogrodowa", people: [["Kazimierz Dworczyński","1910–1987"],["Władysława Dworczyńska","1919–1994"],["Franciszka Szylderowicz","1893–1977"],["Tadeusz Szylderowicz","1901–1983"]],
+    note: "Rok urodzenia Kazimierza zgadza się z aktem z 1910 roku. Tadeusz urodził się w Śremie w 1901 roku, więc Szylderowiczowie to miejscowa rodzina i najlepszy trop co do nazwiska panieńskiego Władysławy.", url: "https://billiongraves.com/grave/Kazimierz-Dworczy%C5%84ski/29912233" },
+  { plot: "Cmentarz parafialny", people: [["Kazimierz Kokociński","1916–2011"],["Anna Kokocińska","1919–2007"],["Roman Szafrański","1946–2015"],["Danuta Szafrańska",""]],
+    note: "Danuta i Roman to w drzewie ich córka i zięć. Kazimierz urodził się w 1916 roku, więc jego akt urodzenia jest już jawny.", url: "https://billiongraves.com/grave/Kazimierz-Kokocinski/25123105" },
+  { plot: "Cmentarz komunalny", people: [["Antoni Rychlewicz","1 XII 1914 – 5 V 1987"],["Maria Rychlewicz","1921–2012"],["Zbigniew Kubiak","1947–2001"],["Karolina Porębska",""]],
+    note: "Ich córka Krystyna wyszła za Kubiaka. Karolina Porębska to zapewne matka Marii, która według wnuczki była z domu Porębska.", url: "https://billiongraves.com/grave/Antoni-Rychlewicz/17260530" },
+  { plot: "Cmentarz komunalny", people: [["Stefan Kaźmierczak","1911–2003"],["Wanda Kaźmierczak","1920–1987"]],
+    note: "Zgadza się z drzewem. Akt chrztu Stefana z 1911 roku to akt z Dobrzeca powyżej.", url: "https://billiongraves.com/grave/Stefan-Ka%C5%BAmierczak/18836430" },
+];
+
+// Numeracja Ahnentafel: 1 = Hubert, 2n = ojciec, 2n+1 = matka.
+const P = {
+  1:{n:"Hubert Dworczyński",y:"ur. 1991",s:"tree"},
+  2:{n:"Michał Dworczyński",y:"ur. 1969",s:"tree"},
+  3:{n:"Arleta Kokocińska",y:"ur. 1967",s:"tree"},
+  4:{n:"Wojciech Dworczyński",y:"1942–2009",s:"tree",f:[["Urodzony","25 II 1942, Śrem"],["Zmarły","20 III 2009, Śrem"]]},
+  5:{n:"Elżbieta Kazimierczak",y:"ur. 1942",s:"tree"},
+  6:{n:"Edward Kokociński",y:"ur. 1939",s:"tree"},
+  7:{n:"Anna Leokadia Rychlewicz",y:"ur. 1944",s:"tree"},
+  8:{n:"Kazimierz Dworczyński",y:"1910–1987",s:"likely",nw:true,f:[["Urodzony","17 XII 1910, Międzychód (pow. śremski)"],["Ślub","19 IV 1941, Śrem, akt 44/1941"],["Zmarły","1987, pochowany w Śremie"]],ev:["b1910","m1901","g0"],
+     note:"Akt urodzenia jest pewny. To, że był ojcem Wojciecha, opiera się na ślubie w Śremie w 1941 roku i wspólnym grobie z Władysławą. Rozstrzygnie to akt małżeństwa."},
+  9:{n:"Władysława Dworczyńska",y:"1919–1994",s:"likely",f:[["Urodzona","1919"],["Zmarła","1994, pochowana w Śremie"],["Z domu","nieznane · możliwe Szylderowicz"]],ev:["g0"],
+     note:"Leży pod jednym nagrobkiem z Kazimierzem oraz z Franciszką (1893–1977) i Tadeuszem (1901–1983) Szylderowiczami."},
+  10:{n:"Stefan Kazimierczak",y:"1911–2003",s:"confirmed",f:[["Urodzony","28 VIII 1911, Dobrzec (Kalisz)"],["Zmarły","2003, pochowany w Śremie"]],ev:["b1911","g3"]},
+  11:{n:"Wanda Adamska",y:"1920–1987",s:"tree",f:[["Zmarła","1987, pochowana w Śremie"]],ev:["g3"],note:"Nazwisko panieńskie Adamska pochodzi z innego drzewa na MyHeritage. W indeksach nie znaleziono jeszcze ich ślubu."},
+  12:{n:"Kazimierz Kokociński",y:"1916–2011",s:"confirmed",f:[["Urodzony","28 XII 1916, Pustelnik, parafia Brzeźnio"],["Zmarły","3 III 2011, Śrem"]],ev:["b1917","g1"]},
+  13:{n:"Anna Zenke",y:"1919–2007",s:"likely",f:[["Urodzona","1919"],["Zmarła","2007, pochowana w Śremie"],["Z domu","Zenke (drzewo) · „Cenkier czy jakoś tak” (Arleta)"]],ev:["g1"],
+     note:"Zenke, Zenker i Cenkier brzmią podobnie, więc to prawdopodobnie jedno nazwisko w różnej pisowni. Rozstrzygnie akt urodzenia Anny z 1919 roku albo akt ślubu Kokocińskich."},
+  14:{n:"Antoni Rychlewicz",y:"1914–1987",s:"likely",f:[["Urodzony","1 XII 1914"],["Zmarły","5 V 1987, pochowany w Śremie"]],ev:["g2"],
+     note:"Możliwi rodzice: Maciej Rychlewicz i Anna z Włodarczaków, którzy mieli dzieci w Śremie w 1908 i 1910 roku."},
+  15:{n:"Maria Porębska",y:"1921–2012",s:"likely",f:[["Urodzona","19 III 1921"],["Zmarła","7 I 2012, pochowana w Śremie"],["Z domu","Porębska (wnuczka Arleta, pewne)"]],ev:["g2"],
+     note:"W tym samym grobie leży Karolina Porębska, zapewne matka Marii. Akt urodzenia z 1921 roku jest już jawny."},
+  16:{n:"Franciszek Dworczyński",y:"ur. 1878",s:"likely",nw:true,f:[["Urodzony","22 X 1878, Drzonek"],["Ślub","18 X 1901, Międzychód"],["Zawód","robotnik"]],ev:["m1901","b1910"],note:"Na pewno ojciec Kazimierza. Pokazany jako prawdopodobny tylko dlatego, że związek Kazimierza z Wojciechem nie jest jeszcze udowodniony."},
+  17:{n:"Katarzyna Walkowiak",y:"ur. 1882",s:"likely",nw:true,f:[["Urodzona","17 X 1882, Pokrzywnica"]],ev:["m1901","b1910"]},
+  20:{n:"Józef Kazimierczak",y:"ok. 1864–1950",s:"confirmed",f:[["Urodzony","ok. 1864, Czartki"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik"]],ev:["m1893","b1911"]},
+  21:{n:"Antonina Dąbkowska",y:"ok. 1871–1953",s:"confirmed",f:[["Urodzona","ok. 1871, Russów"],["Zmarła","1953 (drzewo)"]],ev:["m1893","b1911"],note:"W drzewie było „Dąbska”. Oba akty mówią: Dąbkowska."},
+  24:{n:"Walenty Kokociński",y:"ur. ok. 1880",s:"confirmed",f:[["Mieszkał","Pustelnik, gospodarz, 1917"],["Zmarł","Jaszkowo (drzewo)"]],ev:["b1917"]},
+  25:{n:"Józefa Żeśko",y:"ur. ok. 1888",s:"confirmed",f:[["Mieszkała","Pustelnik, 1917"],["Zmarła","Jaszkowo (drzewo)"]],ev:["b1917","z1892"],note:"Akt z 1917 roku pisze „Józefa z Żyśków”, lat 28; w 1892 roku rodzinę zapisano jako Żeśko. Ślub z Walentym był przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
+  32:{n:"Jan Dworczyński",y:"ur. ok. 1844",s:"likely",nw:true,f:[["Ślub","1869, Dolsk"],["Mieszkał","Drzonek, chałupnik"]],ev:["m1901"]},
+  33:{n:"Marianna Łagoda",y:"ur. ok. 1843",s:"likely",nw:true,ev:["m1901"]},
+  34:{n:"Andrzej Walkowiak",y:"",s:"likely",nw:true,f:[["Mieszkał","Międzychód, owczarz"]],ev:["m1901"]},
+  35:{n:"Marianna Juskowiak",y:"",s:"likely",nw:true,ev:["m1901"]},
+  40:{n:"Stanisław Kazimierczak",y:"zm. przed 1893",s:"confirmed",nw:true,ev:["m1893"]},
+  41:{n:"Katarzyna",y:"żyła w 1893",s:"confirmed",nw:true,ev:["m1893"],note:"Nazwisko panieńskie nie jest podane. Może je podać akt zgonu Józefa z 1950 roku."},
+  42:{n:"Ludwik Dąbkowski",y:"zm. przed 1893",s:"confirmed",nw:true,f:[["Zawód","komornik"]],ev:["m1893"]},
+  43:{n:"Agnieszka Kuk(?)",y:"zm. przed 1893",s:"confirmed",nw:true,ev:["m1893"],note:"Nazwisko panieńskie trudno odczytać w cyrylicy: Kuk albo Kukowa."},
+  50:{n:"Antoni Żeśko",y:"ur. ok. 1858",s:"confirmed",f:[["1892","komornik w Tykadłowie, lat 34"],["1917","gospodarz w Pustelniku, lat 56"],["Później","Tworzykowo; pochowany w Jaszkowie (drzewo)"]],ev:["z1892","b1917"],note:"W 1892 roku zapisany jako Żeśko, w latach 1916–17 jako Żyśko. To, że był ojcem Józefy, jest prawdopodobne, ale nie udowodnione: był świadkiem na chrzcie jej syna w tej samej wsi."},
+  51:{n:"Józefa Szymczak",y:"ur. ok. 1862",s:"confirmed",f:[["1892","lat 30, Tykadłów"],["1916","żyła, Pustelnik"]],ev:["z1892"]},
+};
+
+const GR_EV = { g0: 0, g1: 1, g2: 2, g3: 3 };
+const LABEL = { confirmed: "Potwierdzone", likely: "Prawdopodobne", tree: "Z drzewa", unknown: "Nieznane" };
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+// Fan chart
+const RADII = [0, 72, 152, 232, 312, 405, 500];
+const CX = 500, CY = 520;
+function arcPath(r0, r1, a0, a1) {
+  const p = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
+  const large = a1 - a0 > Math.PI ? 1 : 0;
+  if (r0 === 0) { const [x1, y1] = p(r1, a0), [x2, y2] = p(r1, a1); return `M${CX},${CY} L${x1},${y1} A${r1},${r1} 0 ${large} 1 ${x2},${y2} Z`; }
+  const [a, b] = p(r0, a0), [c, d] = p(r1, a0), [e, f] = p(r1, a1), [g, h] = p(r0, a1);
+  return `M${a},${b} L${c},${d} A${r1},${r1} 0 ${large} 1 ${e},${f} L${g},${h} A${r0},${r0} 0 ${large} 0 ${a},${b} Z`;
+}
+function fill(s) { return { confirmed: css("--confirmed"), likely: css("--likely"), tree: css("--tree") }[s] || css("--unknown"); }
+function drawFan() {
+  const svg = document.getElementById("fan"); svg.innerHTML = "";
+  for (let g = 0; g <= 5; g++) {
+    const n = 2 ** g;
+    for (let i = 0; i < n; i++) {
+      const a = n + i, per = P[a], st = per ? per.s : "unknown";
+      const a0 = Math.PI + (i * Math.PI) / n, a1 = Math.PI + ((i + 1) * Math.PI) / n;
+      const path = el("path", { d: arcPath(RADII[g], RADII[g + 1], a0, a1), class: "seg", fill: fill(st), "data-a": a, tabindex: per ? 0 : -1, role: per ? "button" : "presentation", "aria-label": per ? per.n : "" }, svg);
+      if (per && per.nw) {
+        const mid = (a0 + a1) / 2, r = RADII[g + 1] - 9;
+        el("circle", { cx: CX + r * Math.cos(mid), cy: CY + r * Math.sin(mid), r: 4, fill: css("--leaf"), stroke: css("--stamp"), "stroke-width": 2.2, "pointer-events": "none" }, svg);
+      }
+      path.addEventListener("click", () => select(a));
+      path.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(a); } });
+      if (!per) continue;
+      const dark = st !== "unknown";
+      const mid = (a0 + a1) / 2, deg = (mid * 180) / Math.PI;
+      const rm = (RADII[g] + RADII[g + 1]) / 2;
+      const [first, ...rest] = per.n.split(" "); const last = rest.join(" ");
+      const t = el("text", { "text-anchor": "middle" }, svg);
+      if (g === 0) {
+        t.setAttribute("transform", `translate(${CX},${CY - 30})`);
+        addLines(t, [first, last], [14, 14], dark, per.y);
+      } else if (g <= 3) {
+        const x = CX + rm * Math.cos(mid), y = CY + rm * Math.sin(mid);
+        t.setAttribute("transform", `translate(${x},${y}) rotate(${deg + 90})`);
+        const sz = [0, 17, 15, 13][g];
+        addLines(t, [first, last], [sz, sz], dark, per.y);
+      } else {
+        const flip = deg < 270;
+        const x = CX + rm * Math.cos(mid), y = CY + rm * Math.sin(mid);
+        t.setAttribute("transform", `translate(${x},${y}) rotate(${flip ? deg + 180 : deg})`);
+        const sz = g === 4 ? 12 : 10.5;
+        addLines(t, [first, last], [sz, sz], dark, per.y, true);
+      }
+    }
+  }
+  el("text", { x: 20, y: 550, class: "yr", "font-size": 13 }, svg).textContent = "← strona ojca";
+  const r = el("text", { x: 980, y: 550, class: "yr", "font-size": 13, "text-anchor": "end" }, svg); r.textContent = "strona matki →";
+}
+function addLines(t, names, sizes, dark, years, compact) {
+  const lines = [[names[0], "nm", sizes[0]], [names[1], "nm", sizes[1]]];
+  if (years) lines.push([years, "yr", sizes[1] * 0.82]);
+  const lh = compact ? 1.08 : 1.15;
+  const total = lines.reduce((s, l) => s + l[2] * lh, 0);
+  let y = -total / 2 + lines[0][2] * 0.8;
+  lines.forEach(([txt, cls, sz], k) => {
+    if (!txt) return;
+    const ts = el("tspan", { x: 0, y: y.toFixed(1), class: cls + (dark ? " on-dark" : ""), "font-size": sz }, t);
+    ts.textContent = txt; y += sz * lh;
+  });
+}
+
+// Detail panel
+function select(a) {
+  document.querySelectorAll("#fan .seg").forEach(s => s.classList.toggle("sel", +s.dataset.a === a));
+  const per = P[a], d = document.getElementById("detail");
+  const gen = Math.floor(Math.log2(a));
+  const rel = (a % 2 ? ["Hubert","Matka","Babcia","Prababcia","Praprababcia","Prapraprababcia"] : ["Hubert","Ojciec","Dziadek","Pradziadek","Prapradziadek","Praprapradziadek"])[gen];
+  if (!per) {
+    d.innerHTML = `<span class="eyebrow">${rel} · dziecko: ${P[Math.floor(a / 2)]?.n || "—"}</span><h3>Jeszcze nieznane</h3><p class="note">Żaden z dotąd przeszukanych indeksów nie wskazuje tej osoby.</p>`;
+    return;
+  }
+  const facts = (per.f || []).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  const ev = (per.ev || []).map(k => k in GR_EV
+      ? `<a href="#graves">Nagrobek · ${GRAVES[GR_EV[k]].plot.split(",")[0]}</a>`
+      : `<a href="#ev-${k}">${EVIDENCE[k].short}</a>`).join("");
+  d.innerHTML = `
+    <span class="eyebrow">${rel}${a > 1 ? ` · dziecko: ${P[Math.floor(a / 2)].n}` : ""}</span>
+    <h3>${per.n}</h3>
+    <div class="chips"><span class="chip ${per.s}">${LABEL[per.s]}</span>${per.nw ? '<span class="chip new">Nowe</span>' : ""}</div>
+    ${per.y && !facts ? `<p class="mono soft">${per.y}</p>` : ""}
+    ${facts ? `<dl class="facts">${facts}</dl>` : ""}
+    ${per.note ? `<p class="note">${per.note}</p>` : ""}
+    ${ev ? `<div class="ev">${ev}</div>` : ""}`;
+}
+
+// Evidence leaves
+function drawLeaves() {
+  const box = document.getElementById("leaves");
+  box.innerHTML = Object.entries(EVIDENCE).map(([k, e]) => `
+    <article class="leaf" id="ev-${k}">
+      <figure>
+        <img src="${e.img}" alt="Skan: ${e.cap}" loading="lazy">
+        <figcaption>${e.cap}</figcaption>
+        ${e.extra ? `<img src="${e.extra.img}" alt="${e.extra.cap}" loading="lazy"><figcaption>${e.extra.cap}</figcaption>` : ""}
+      </figure>
+      <div class="body">
+        <span class="eyebrow">${e.when}</span>
+        <h3>${e.title}</h3>
+        <div class="reading"><span class="orig">${e.orig}</span><p>${e.reading}</p></div>
+        ${e.extra ? `<div class="reading"><span class="orig">${e.extra.orig}</span><p>${e.extra.reading}</p></div>` : ""}
+        <ul>${e.points.map(p => `<li>${p}</li>`).join("")}</ul>
+        <div class="cite">${e.cite}<br><a href="${e.url}" target="_blank" rel="noopener">Zobacz skan w ${e.site}</a></div>
+      </div>
+    </article>`).join("");
+}
+function drawGraves() {
+  document.getElementById("grave-rows").innerHTML = GRAVES.map(g => `
+    <tr><td>Śrem, ${g.plot}<br><a class="mono" href="${g.url}" target="_blank" rel="noopener">BillionGraves</a></td>
+    <td>${g.people.map(([n, y]) => `${n} <span class="yrs">${y}</span>`).join("<br>")}</td>
+    <td>${g.note}</td></tr>`).join("");
+}
+
+// Maps (equirectangular, cos-lat corrected)
+const PL = {"Poznań":[52.411,16.938],"Śrem":[52.091,17.017],"Dolsk":[51.987,17.066],"Kórnik":[52.25,17.088],"Międzychód":[52.026,17.03],"Drzonek":[52.031,17.056],"Pokrzywnica":[51.962,17.107],"Lubiń":[51.964,16.896],"Jaszkowo":[52.142,16.974],"Tworzykowo":[52.17,16.973],"Kalisz":[51.761,18.087],"Dobrzec":[51.754,18.036],"Tykadłów":[51.857,18.126],"Russów":[51.844,18.097],"Czartki":[51.835,18.154],"Borków":[51.829,18.126],"Brzeźnio":[51.495,18.623],"Pustelnik":[51.512,18.621],"Ostrów":[51.493,18.579],"Sieradz":[51.596,18.732]};
+function proj(b, W, H, pad) {
+  const k = Math.cos((b.lat0 + b.lat1) / 2 * Math.PI / 180);
+  const sx = (W - 2 * pad) / ((b.lon1 - b.lon0) * k), sy = (H - 2 * pad) / (b.lat1 - b.lat0), s = Math.min(sx, sy);
+  const ox = (W - (b.lon1 - b.lon0) * k * s) / 2, oy = (H - (b.lat1 - b.lat0) * s) / 2;
+  return ([lat, lon]) => [ox + (lon - b.lon0) * k * s, oy + (b.lat1 - lat) * s];
+}
+function drawMap(id, W, H, bounds, items, extra) {
+  const svg = document.getElementById(id); svg.innerHTML = "";
+  const pr = proj(bounds, W, H, 24);
+  for (let lon = Math.ceil(bounds.lon0 * 10) / 10; lon < bounds.lon1; lon += bounds.step) { const [x] = pr([bounds.lat0, lon]); el("line", { x1: x, x2: x, y1: 0, y2: H, class: "grid" }, svg); }
+  for (let lat = Math.ceil(bounds.lat0 * 10) / 10; lat < bounds.lat1; lat += bounds.step) { const [, y] = pr([lat, bounds.lon0]); el("line", { x1: 0, x2: W, y1: y, y2: y, class: "grid" }, svg); }
+  if (extra) extra(svg, pr);
+  for (const it of items) {
+    const [x, y] = pr(PL[it.p]);
+    el("circle", { cx: x, cy: y, r: it.r || 5, class: "dot", fill: css(it.c ? "--" + it.c : "--ink-soft") }, svg);
+    const t = el("text", { x: x + (it.dx ?? 9), y: y + (it.dy ?? 4), class: "lbl" + (it.small ? " small" : "") + (it.big ? " big" : ""), "text-anchor": it.anchor || "start" }, svg);
+    t.textContent = it.label || it.p;
+    if (it.sub) { const s = el("text", { x: x + (it.dx ?? 9), y: y + (it.dy ?? 4) + 15, class: "lbl small", "text-anchor": it.anchor || "start" }, svg); s.textContent = it.sub; }
+  }
+}
+function drawMaps() {
+  drawMap("map-main", 760, 470, { lat0: 51.42, lat1: 52.48, lon0: 16.7, lon1: 18.95, step: 0.25 }, [
+    { p: "Poznań", label: "Poznań", sub: "tu mieszka Hubert" },
+    { p: "Śrem", label: "Śrem", big: true, r: 7, c: "stamp", dx: -14, dy: 6, anchor: "end", sub: "tu pochowane cztery pary" },
+    { p: "Kalisz", label: "Kalisz", big: true, r: 7, c: "stamp", dx: -12, dy: 30, anchor: "end", sub: "Kazimierczak · Dąbkowski" },
+    { p: "Pustelnik", label: "Brzeźnio", big: true, r: 7, c: "stamp", dx: -12, dy: 22, anchor: "end", sub: "Kokociński · Żyśko" },
+    { p: "Sieradz", label: "Sieradz", small: true, dx: 8, dy: -6 },
+  ], (svg, pr) => {
+    const [x3, y3] = pr(PL["Pustelnik"]); el("circle", { cx: x3, cy: y3, r: 34, class: "halo" }, svg);
+    const [x1, y1] = pr(PL["Śrem"]), [x2, y2] = pr(PL["Kalisz"]);
+    el("circle", { cx: x1, cy: y1, r: 46, class: "halo" }, svg);
+    el("circle", { cx: x2, cy: y2, r: 40, class: "halo" }, svg);
+    el("path", { d: `M${x2 - 10},${y2 - 12} Q${(x1 + x2) / 2 + 30},${(y1 + y2) / 2 - 110} ${x1 + 14},${y1 + 4}`, class: "route" }, svg);
+    el("path", { d: `M${x3 - 14},${y3 - 10} Q${x1 + 120},${y3 - 40} ${x1 + 8},${y1 + 14}`, class: "route" }, svg);
+    const w = el("text", { x: 748, y: 120, class: "lbl small", "text-anchor": "end" }, svg); w.textContent = "Warszawa 250 km →";
+    const w2 = el("text", { x: 748, y: 136, class: "lbl small", "text-anchor": "end" }, svg); w2.textContent = "tam ur. Elżbieta, 1942";
+    const [bx, by] = pr([51.62, 16.85]);
+    const [bx2] = pr([51.62, 16.85 + 20 / (111.32 * Math.cos(51.62 * Math.PI / 180))]);
+    el("line", { x1: bx, y1: by, x2: bx2, y2: by, stroke: css("--ink-soft"), "stroke-width": 2 }, svg);
+    el("text", { x: bx, y: by + 16, class: "lbl small" }, svg).textContent = "20 km";
+  });
+  drawMap("map-srem", 340, 250, { lat0: 51.94, lat1: 52.19, lon0: 16.86, lon1: 17.14, step: 0.05 }, [
+    { p: "Śrem", r: 6, c: "ink", label: "Śrem", sub: "groby czterech par", dx: 10, dy: -4 },
+    { p: "Międzychód", c: "likely", label: "Międzychód", sub: "Kazimierz ur. 1910", anchor: "end", dx: -9, dy: 4 },
+    { p: "Drzonek", c: "likely", label: "Drzonek", sub: "Franciszek ur. 1878", dx: 9, dy: 2 },
+    { p: "Pokrzywnica", c: "likely", label: "Pokrzywnica", sub: "Katarzyna ur. 1882", dx: 9, dy: 4 },
+    { p: "Dolsk", c: "likely", label: "Dolsk", sub: "ślub Jana i Marianny, 1869", anchor: "end", dx: -9, dy: 4 },
+    { p: "Jaszkowo", c: "tree", label: "Jaszkowo", sub: "zmarli Walenty, Józefa, Antoni", anchor: "end", dx: -9, dy: 4 },
+    { p: "Tworzykowo", c: "tree", label: "Tworzykowo", sub: "mieszkał Antoni Żeśko", dx: 9, dy: 0 },
+    { p: "Lubiń", small: true, label: "Lubiń", dx: -8, dy: 14, anchor: "end" },
+  ]);
+  drawMap("map-kalisz", 340, 250, { lat0: 51.73, lat1: 51.875, lon0: 17.99, lon1: 18.19, step: 0.025 }, [
+    { p: "Kalisz", c: "ink", r: 6, label: "Kalisz", sub: "Józef zm. 1950", dx: 10, dy: 4 },
+    { p: "Dobrzec", c: "confirmed", label: "Dobrzec", sub: "Stefan ur. 1911", anchor: "end", dx: -9, dy: -2 },
+    { p: "Tykadłów", c: "confirmed", label: "Tykadłów", sub: "Kazimierczakowie 1893 · Żeśkowie 1892", anchor: "end", dx: -9, dy: -4 },
+    { p: "Russów", c: "confirmed", label: "Russów", sub: "Antonina ur. ok. 1871", anchor: "end", dx: -9, dy: 6 },
+    { p: "Czartki", c: "confirmed", label: "Czartki", sub: "Józef ur. ok. 1864", dx: 9, dy: -14 },
+    { p: "Borków", c: "confirmed", label: "Borków", sub: "Józef mieszkał 1893", dx: 9, dy: 16 },
+  ]);
+}
+
+function drawBrz() {
+  drawMap("map-brzeznio", 340, 200, { lat0: 51.475, lat1: 51.53, lon0: 18.55, lon1: 18.66, step: 0.025 }, [
+    { p: "Pustelnik", c: "confirmed", label: "Pustelnik", sub: "Kazimierz ur. 1916 · gospodarstwo Żyśków", dx: 10, dy: -2 },
+    { p: "Brzeźnio", c: "ink", r: 6, label: "Brzeźnio", sub: "kościół parafialny", dx: 10, dy: 6 },
+    { p: "Ostrów", c: "tree", label: "Ostrów", sub: "Edward ur. 1939?", anchor: "end", dx: -9, dy: 4 },
+  ]);
+}
+function render() { drawFan(); drawLeaves(); drawGraves(); drawMaps(); drawBrz(); select(window._sel || 8); }
+window._sel = 8;
+const _sel = select; select = a => { window._sel = a; _sel(a); };
+render();
+{ const fb = document.querySelector(".fan-box"); if (fb) fb.scrollLeft = (fb.scrollWidth - fb.clientWidth) / 2; }
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawFan(); drawMaps(); drawBrz(); select(window._sel); });
+new MutationObserver(() => { drawFan(); drawMaps(); drawBrz(); select(window._sel); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>

@@ -188,7 +188,7 @@ footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
   <div class="findings">
     <div class="finding"><span class="eyebrow">Dworczyńscy</span><span class="big">Ślub 19 kwietnia 1941</span><p>Adnotacja na akcie urodzenia Kazimierza z 1910 roku wskazuje akt małżeństwa nr 44/1941 w Śremie, dziesięć miesięcy przed narodzinami Wojciecha.</p></div>
     <div class="finding"><span class="eyebrow">Kazimierczakowie</span><span class="big">Antonina z Dąbkowskich</span><p>Nie Dąbska. Akt chrztu syna Stefana z 1911 roku i akt jej ślubu z 1893 roku mówią zgodnie: „z Dąbkowskich”.</p></div>
-    <div class="finding"><span class="eyebrow">Kokocińscy · Żeśkowie</span><span class="big">Z Tykadłowa do Pustelnika</span><p>Antoni Żeśko i Józefa z Szymczaków mieszkali w 1892 roku w Tykadłowie, potem w Pustelniku pod Sieradzem. Tam w 1916 roku urodził się Kazimierz Kokociński.</p></div>
+    <div class="finding"><span class="eyebrow">Kokocińscy · Żeśkowie</span><span class="big">Z Tykadłowa do Pustelnika</span><p>Antoni Żeśko i Józefa z Szymczaków mieszkali w 1892 roku w Tykadłowie, potem w Pustelniku pod Sieradzem. Tam w 1916 roku urodził się ich wnuk Kazimierz Kokociński; jego rodzice, Walenty i Józefa, wzięli ślub w Tykadłowie w 1908 roku.</p></div>
     <div class="finding"><span class="eyebrow">Wciąż otwarte</span><span class="big">Władysława z domu ?</span><p>Odpowiedź leży w jednym dokumencie w USC w Śremie. Najmocniejszy trop to Szylderowicz.</p></div>
   </div>
 
@@ -240,8 +240,8 @@ footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
       <li><div class="what">USC Śrem: akt małżeństwa nr 44/1941</div><div class="why">Kazimierz Dworczyński i Władysława. Poda jej nazwisko panieńskie, datę i miejsce urodzenia oraz rodziców. Archiwum Państwowe w Poznaniu nie ma ksiąg z 1941 roku.</div></li>
       <li><div class="what">USC Śrem: akt urodzenia Wojciecha, 25 lutego 1942</div><div class="why">Wymienia oboje rodziców z nazwiskiem panieńskim matki. Niezależnie potwierdzi, że ojcem był Kazimierz.</div></li>
       <li><div class="what">Wizyta na cmentarzu przykościelnym, ul. Ogrodowa</div><div class="why">Na nagrobku Dworczyńskich może być napisane „z d. …” przy Władysławie. Za darmo i być może najszybciej.</div></li>
-      <li><div class="what">Archiwum w Sieradzu: księgi parafii Brzeźnio sprzed 1915</div><div class="why">Ślub Walentego Kokocińskiego z Józefą Żyśko i jej urodzenie około 1888 roku. Potwierdzi, że jej rodzicami byli Antoni i Józefa z Szymczaków.</div></li>
-      <li><div class="what">USC Kalisz: akt zgonu nr 173/1950, Józef Kazimierczak</div><div class="why">Powinien podać nazwisko panieńskie jego matki, jedyną lukę w linii Kazimierczaków.</div></li>
+      <li><div class="what">Archiwum Państwowe w Poznaniu: urodzenia Śrem 1919 i 1921</div><div class="why">Akty urodzenia Władysławy (1919) i Marii Porębskiej (1921). Księgi istnieją, ale nie mają skanów w sieci.</div></li>
+      <li><div class="what">USC Śrem: akt zgonu Wandy Kazimierczak, 1987</div><div class="why">Poda datę i miejsce jej urodzenia oraz imiona rodziców. Dziś jedyny trop to Wanda Janina Adamska, ur. 16 czerwca 1920 w Warszawie.</div></li>
     </ol>
   </section>
 
@@ -338,7 +338,12 @@ const EVIDENCE = {
     orig: "der Bergmann Mathias (Maciej) Rychlewicz … geboren am siebenzehnten Februar … achtzig zu Tulce … Sohn des Arbeiters Valentin Rychlewicz zu Rogalin und dessen verstorbenen Ehefrau Victoria geborenen Wojtkowiak … Tochter des zu Mechlin verstorbenen Wirts Roch Włodarczak und dessen Ehefrau Marianna geborenen Cikowiak",
     reading: "Górnik Maciej Rychlewicz, ur. 17 lutego 1880 w Tulcach, mieszkający w Osterfeld (Zagłębie Ruhry), syn robotnika Walentego Rychlewicza z Rogalina i zmarłej Wiktorii z Wojtkowiaków, poślubia Annę Włodarczak, córkę gospodarza, ur. 16 lipca 1886 w Mechlinie, córkę zmarłego Rocha Włodarczaka i Marianny z Cikowiaków.",
     points: ["Pieczątka na marginesie: żona zmarła 13 lipca 1958 w Mechlinie (USC Mechlin 4/1958).", "Akt urodzenia Anny (USC Śrem 1886, nr 319) podaje tych samych rodziców.", "Walenty i Wiktoria wzięli ślub w parafii Tulce w 1873 roku (indeks Geneteki)."] },
-};
+  m1908: { title: "Ślub Walentego Kokocińskiego i Józefy Żeśko", short: "1908 · ślub", when: "Tykadłów, 16 lutego 1908", img: "img/1908-marriage-kokocinski-zesko.jpg",
+    cap: "Parafia Tykadłów, małżeństwa 1908, akt nr 12 (po rosyjsku)",
+    cite: "Archiwum Państwowe w Kaliszu, 11/764/0/1/84, skan 28 · urodzenie Walentego: Tykadłów 1881, akt 3", url: SWA(11961718), site: "szukajwarchiwach.gov.pl",
+    orig: "Валентомъ Кокоцинскимъ (Walentym Kokocińskim) … сыномъ Кацпра Кокоцинскаго и жены его Михалины урожденной Шляковска … Юзефою Жесько (Józefą Żeśko) … дочерью Антонія Жесько и жены его Юзефы урожденной Шимчакъ",
+    reading: "Walenty Kokociński, kawaler, lat 27, urodzony i mieszkający przy rodzicach w Tykadłowie, syn Kacpra i Michaliny ze Szlakowskich(?), poślubia Józefę Żeśko, pannę, lat 21, urodzoną i mieszkającą przy rodzicach w Tykadłowie, córkę Antoniego Żeśki i Józefy z Szymczaków.",
+    points: ["Walenty urodził się w Tykadłowie 13 lutego 1881 (akt 3/1881), syn Kacpra, służącego, lat 27, i Michaliny, lat 24.", "Na marginesie: żona zmarła 10 grudnia 1980 (USC nr 57/80), tak samo jak na jej akcie urodzenia.", "Między 1908 a 1916 rokiem rodzina przeniosła się z Tykadłowa do Pustelnika pod Sieradzem."] },};
 const GRAVES = [
   { plot: "Cmentarz przykościelny, ul. Ogrodowa", people: [["Kazimierz Dworczyński","1910–1987"],["Władysława Dworczyńska","1919–1994"],["Franciszka Szylderowicz","1893–1977"],["Tadeusz Szylderowicz","1901–1983"]],
     note: "Rok urodzenia Kazimierza zgadza się z aktem z 1910 roku. Tadeusz urodził się w Śremie w 1901 roku, więc Szylderowiczowie to miejscowa rodzina i najlepszy trop co do nazwiska panieńskiego Władysławy.", url: "https://billiongraves.com/grave/Kazimierz-Dworczy%C5%84ski/29912233" },
@@ -381,8 +386,10 @@ const P = {
   17:{n:"Katarzyna Walkowiak",y:"ur. 1882",s:"likely",nw:true,f:[["Urodzona","17 X 1882, Pokrzywnica"]],ev:["m1877","m1901","b1910"],note:"Rodzeństwo według indeksu Geneteki: Michał 1880, Weronika 1887, Marianna 1897, Stanisław 1899, Stanisława 1905."},
   20:{n:"Józef Kazimierczak",y:"1863–1950",s:"confirmed",f:[["Urodzony","3 II 1863, Czartki (parafia Borków)"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik, sługa dworski"]],ev:["b1863","m1893","b1911"],note:"Pierwsza żona: Katarzyna z Mikołajczyków, ślub w Borkowie 29 stycznia 1886 (akt 1/1886), zmarła w Borkowie 16 sierpnia 1892 w wieku 24 lat (akt zgonu 23/1892). Ich córka Józefa urodziła się w Borkowie 31 stycznia 1888 (akt 4/1888). Rodzeństwo z Borkowa: Maryanna 1856, Katarzyna 1865, Tomasz 1867."},
   21:{n:"Antonina Dąbkowska",y:"ok. 1871–1953",s:"confirmed",f:[["Urodzona","ok. 1871, Russów"],["Zmarła","1953 (drzewo)"]],ev:["m1893","b1911","m1865"],note:"W drzewie było „Dąbska”. Oba akty mówią: Dąbkowska."},
-  24:{n:"Walenty Kokociński",y:"ur. ok. 1880",s:"confirmed",f:[["Mieszkał","Pustelnik, gospodarz, 1917"],["Zmarł","Jaszkowo (drzewo)"]],ev:["b1917"]},
-  25:{n:"Józefa Żeśko",y:"1887–1980",s:"confirmed",f:[["Urodzona","19 III 1887, Tykadłów"],["Mieszkała","Pustelnik, 1917"],["Zmarła","10 XII 1980, gmina Brodnica (USC Brodnica 57/1980)"]],ev:["b1887","b1917"],note:"W aktach także Żyśko i Rześko. Ślub z Walentym przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
+  24:{n:"Walenty Kokociński",y:"1881 –",s:"confirmed",f:[["Urodzony","13 II 1881, Tykadłów"],["Ślub","16 II 1908, Tykadłów"],["1917","gospodarz w Pustelniku"],["Zmarł","Jaszkowo (drzewo)"]],ev:["m1908","b1917"],note:"Syn Kacpra Kokocińskiego i Michaliny ze Szlakowskich(?). Akt urodzenia: Tykadłów 1881, nr 3. Siostra Marianna (ur. ok. 1884) wyszła w 1908 za Stanisława Zakrockiego."},
+  48:{n:"Kacper Kokociński",y:"ur. ok. 1854",s:"confirmed",nw:true,f:[["1881","służący w Tykadłowie, lat 27"],["1908","gospodarz w Tykadłowie"]],ev:["m1908"]},
+  49:{n:"Michalina Szlakowska(?)",y:"ur. ok. 1857",s:"confirmed",nw:true,f:[["1881","lat 24, Tykadłów"]],ev:["m1908"],note:"Nazwisko zapisane po rosyjsku jako Слаковска (1881) i Шляковска (1908): Szlakowska albo Ślakowska."},
+  25:{n:"Józefa Żeśko",y:"1887–1980",s:"confirmed",f:[["Urodzona","19 III 1887, Tykadłów"],["Ślub","16 II 1908, Tykadłów"],["Mieszkała","Pustelnik, 1917"],["Zmarła","10 XII 1980, gmina Brodnica (USC Brodnica 57/1980)"]],ev:["b1887","m1908","b1917"],note:"W aktach także Żyśko i Rześko."},
   32:{n:"Jan Dworczyński",y:"ur. ok. 1844",s:"likely",nw:true,f:[["Ślub","1869, Dolsk"],["Mieszkał","Drzonek, chałupnik"]],ev:["m1901"]},
   33:{n:"Marianna Łagoda",y:"ur. ok. 1843",s:"likely",nw:true,ev:["m1901"]},
   34:{n:"Andrzej Walkowiak",y:"ur. 1853",s:"confirmed",nw:true,f:[["Urodzony","17 XI 1853, Jawory (pow. śremski)"],["Ślub","25 VIII 1877, Borek"],["Mieszkał","Pokrzywnica, później Międzychód, owczarz"]],ev:["m1877","m1901"],note:"Syn Franciszka Walkowiaka, chałupnika z Pokrzywnicy, i Józefy z Pawlaków."},

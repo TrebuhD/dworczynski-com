@@ -177,7 +177,7 @@ footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
       <div class="legend" aria-label="Legenda">
         <span><i class="sw confirmed"></i>Potwierdzone skanem aktu</span>
         <span><i class="sw likely"></i>Prawdopodobne, jedno ogniwo do udowodnienia</span>
-        <span><i class="sw tree"></i>Z drzewa rodzinnego, niesprawdzone</span>
+        <span><i class="sw tree"></i>Z drzewa rodzinnego, potwierdzone przez rodzinę</span>
         <span><i class="sw unknown"></i>Nieznane</span>
         <span><i class="sw new"></i>Nowe w drzewie</span>
       </div>
@@ -326,6 +326,18 @@ const EVIDENCE = {
     orig: "pomiędzy Ludwikiem Dąbkowskim kawalerem … synem Mateusza i Elżbiety z Gnerowiczów … a Agnieszką z Kurzów Żarnecką, wdową",
     reading: "Ludwik Dąbkowski, kawaler, około 20 lat, urodzony i mieszkający przy rodzicach w Tykadłowie, syn Mateusza i Elżbiety Dąbkowskich, gospodarzy, poślubia Agnieszkę, wdowę po Żarneckim, lat 30, urodzoną w Russowie, córkę zmarłych Wojciecha i Maryanny.",
     points: ["To rodzice Antoniny Dąbkowskiej (ur. ok. 1871 w Russowie) i jej siostry Marianny.", "Nazwisko panieńskie Agnieszki jest trudne do odczytania: tu „z Kurzów”, w akcie z 1893 roku coś w rodzaju „Kuk”."] },
+  b1914: { title: "Akt urodzenia Antoniego Rychlewicza", short: "1914 · urodzenie", when: "Wieszczyczyn (USC Dolsk), 1 grudnia 1914", img: "img/1914-birth-antoni-rychlewicz.jpg",
+    cap: "USC Dolsk, Rejestr główny urodzeń 1914, nr 276",
+    cite: "Archiwum Państwowe w Poznaniu, 53/1849/0/1/251, skan 141", url: SWA(9674571), site: "szukajwarchiwach.gov.pl",
+    orig: "von der Anna Rychlewicz geborenen Włodarczak, Ehefrau des Gutsgespannarbeiters Matthias Rychlewicz … zu Wieszczyczyn … am ersten Dezember … tausend neunhundert vierzehn nachmittags um drei Uhr ein Knabe … Anton",
+    reading: "Akuszerka Jadwiga Rubach z Dolska zgłasza 7 grudnia 1914, że Anna Rychlewicz z domu Włodarczak, żona robotnika folwarcznego Macieja Rychlewicza z Wieszczyczyna, urodziła 1 grudnia 1914 o trzeciej po południu syna, któremu nadano imię Antoni.",
+    points: ["Data zgadza się co do dnia z nagrobkiem w Śremie.", "Rodzeństwo według indeksu BaSIA: Marianna 1908 i Jan 1910 (Mechlin, USC Śrem), Teofil 1912 (Russocin, USC Dolsk)."] },
+  m1904: { title: "Ślub Macieja Rychlewicza i Anny Włodarczak", short: "1904 · ślub", when: "Śrem, 29 kwietnia 1904", img: "img/1904-marriage-rychlewicz-wlodarczak.jpg",
+    cap: "USC Śrem, małżeństwa 1904, nr 20",
+    cite: "Archiwum Państwowe w Poznaniu, 53/1963/0/2/221, skan 42 · urodzenie Anny: USC Śrem 1886 nr 319", url: SWA(1414164), site: "szukajwarchiwach.gov.pl",
+    orig: "der Bergmann Mathias (Maciej) Rychlewicz … geboren am siebenzehnten Februar … achtzig zu Tulce … Sohn des Arbeiters Valentin Rychlewicz zu Rogalin und dessen verstorbenen Ehefrau Victoria geborenen Wojtkowiak … Tochter des zu Mechlin verstorbenen Wirts Roch Włodarczak und dessen Ehefrau Marianna geborenen Cikowiak",
+    reading: "Górnik Maciej Rychlewicz, ur. 17 lutego 1880 w Tulcach, mieszkający w Osterfeld (Zagłębie Ruhry), syn robotnika Walentego Rychlewicza z Rogalina i zmarłej Wiktorii z Wojtkowiaków, poślubia Annę Włodarczak, córkę gospodarza, ur. 16 lipca 1886 w Mechlinie, córkę zmarłego Rocha Włodarczaka i Marianny z Cikowiaków.",
+    points: ["Pieczątka na marginesie: żona zmarła 13 lipca 1958 w Mechlinie (USC Mechlin 4/1958).", "Akt urodzenia Anny (USC Śrem 1886, nr 319) podaje tych samych rodziców.", "Walenty i Wiktoria wzięli ślub w parafii Tulce w 1873 roku (indeks Geneteki)."] },
 };
 const GRAVES = [
   { plot: "Cmentarz przykościelny, ul. Ogrodowa", people: [["Kazimierz Dworczyński","1910–1987"],["Władysława Dworczyńska","1919–1994"],["Franciszka Szylderowicz","1893–1977"],["Tadeusz Szylderowicz","1901–1983"]],
@@ -356,13 +368,18 @@ const P = {
   12:{n:"Kazimierz Kokociński",y:"1916–2011",s:"confirmed",f:[["Urodzony","28 XII 1916, Pustelnik, parafia Brzeźnio"],["Zmarły","3 III 2011, Śrem"]],ev:["b1917","g1"]},
   13:{n:"Anna Cenker",y:"1919–2007",s:"likely",f:[["Urodzona","1919"],["Zmarła","2007, pochowana w Śremie"],["Z domu","Cenker (wg rodziny) · w drzewie MyHeritage „Zenke”"]],ev:["g1"],
      note:"Nazwisko panieńskie podajemy za rodziną: Cenker, przez C. W drzewie MyHeritage zapisano je jako Zenke. Jeszcze nie widzieliśmy go w dokumencie; potwierdzi je akt urodzenia Anny z 1919 roku albo akt ślubu Kokocińskich."},
-  14:{n:"Antoni Rychlewicz",y:"1914–1987",s:"likely",f:[["Urodzony","1 XII 1914"],["Zmarły","5 V 1987, pochowany w Śremie"]],ev:["g2"],
-     note:"Możliwi rodzice: Maciej Rychlewicz i Anna z Włodarczaków, którzy mieli dzieci w Śremie w 1908 i 1910 roku."},
+  14:{n:"Antoni Rychlewicz",y:"1914–1987",s:"confirmed",nw:true,f:[["Urodzony","1 XII 1914, Wieszczyczyn (USC Dolsk 276/1914)"],["Zmarły","5 V 1987, pochowany w Śremie"]],ev:["b1914","g2"],note:"Syn Macieja Rychlewicza i Anny z Włodarczaków."},
   15:{n:"Maria Porębska",y:"1921–2012",s:"likely",f:[["Urodzona","19 III 1921"],["Zmarła","7 I 2012, pochowana w Śremie"],["Z domu","Porębska (wnuczka Arleta, pewne)"]],ev:["g2"],
      note:"W tym samym grobie leży Karolina Porębska, zapewne matka Marii. Akt urodzenia z 1921 roku jest już jawny."},
+  28:{n:"Maciej Rychlewicz",y:"ur. 1880",s:"confirmed",nw:true,f:[["Urodzony","17 II 1880, Tulce"],["Ślub","29 IV 1904, Śrem"],["1904","górnik w Osterfeld (Zagłębie Ruhry)"],["1914","robotnik folwarczny w Wieszczyczynie"]],ev:["m1904","b1914"]},
+  29:{n:"Anna Włodarczak",y:"1886–1958",s:"confirmed",nw:true,f:[["Urodzona","16 VII 1886, Mechlin"],["Ślub","29 IV 1904, Śrem"],["Zmarła","13 VII 1958, Mechlin"]],ev:["m1904","b1914"]},
+  56:{n:"Walenty Rychlewicz",y:"ur. ok. 1848",s:"confirmed",nw:true,f:[["1904","robotnik w Rogalinie"]],ev:["m1904"],note:"Ślub z Wiktorią Wojtkowiak w parafii Tulce w 1873 roku (indeks Geneteki, akt 15)."},
+  57:{n:"Wiktoria Wojtkowiak",y:"ok. 1851 – przed 1904",s:"confirmed",nw:true,f:[["Mieszkała","Tulce, potem Wiry pod Poznaniem"]],ev:["m1904"],note:"Według indeksu BaSIA zmarła w Wirach w 1885 roku."},
+  58:{n:"Roch Włodarczak",y:"zm. przed 1904",s:"confirmed",nw:true,f:[["Zawód","gospodarz w Mechlinie"]],ev:["m1904"]},
+  59:{n:"Marianna Cikowiak",y:"żyła 1904",s:"confirmed",nw:true,f:[["1904","Mechlin"]],ev:["m1904"]},
   16:{n:"Franciszek Dworczyński",y:"ur. 1878",s:"likely",nw:true,f:[["Urodzony","22 X 1878, Drzonek (USC Grzymisław nr 88)"],["Ślub","18 X 1901, Międzychód"],["Zawód","robotnik"]],ev:["m1901","b1910"],note:"Na pewno ojciec Kazimierza: potwierdza to akt urodzenia z 1878 roku i akt ślubu z 1901. Pokazany jako prawdopodobny tylko dlatego, że związek Kazimierza z Wojciechem nie jest jeszcze udowodniony."},
   17:{n:"Katarzyna Walkowiak",y:"ur. 1882",s:"likely",nw:true,f:[["Urodzona","17 X 1882, Pokrzywnica"]],ev:["m1877","m1901","b1910"],note:"Rodzeństwo według indeksu Geneteki: Michał 1880, Weronika 1887, Marianna 1897, Stanisław 1899, Stanisława 1905."},
-  20:{n:"Józef Kazimierczak",y:"1863–1950",s:"confirmed",f:[["Urodzony","3 II 1863, Czartki (parafia Borków)"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik, sługa dworski"]],ev:["b1863","m1893","b1911"],note:"Pierwsza żona, Katarzyna z Mikołajczyków, zmarła w Borkowie 16 sierpnia 1892 roku w wieku 24 lat (akt zgonu 23/1892). Rodzeństwo z Borkowa: Maryanna 1856, Katarzyna 1865, Tomasz 1867."},
+  20:{n:"Józef Kazimierczak",y:"1863–1950",s:"confirmed",f:[["Urodzony","3 II 1863, Czartki (parafia Borków)"],["Ślub","22 I 1893, Tykadłów"],["Zmarły","1 III 1950, Kalisz"],["Zawód","wyrobnik, sługa dworski"]],ev:["b1863","m1893","b1911"],note:"Pierwsza żona: Katarzyna z Mikołajczyków, ślub w Borkowie 29 stycznia 1886 (akt 1/1886), zmarła w Borkowie 16 sierpnia 1892 w wieku 24 lat (akt zgonu 23/1892). Ich córka Józefa urodziła się w Borkowie 31 stycznia 1888 (akt 4/1888). Rodzeństwo z Borkowa: Maryanna 1856, Katarzyna 1865, Tomasz 1867."},
   21:{n:"Antonina Dąbkowska",y:"ok. 1871–1953",s:"confirmed",f:[["Urodzona","ok. 1871, Russów"],["Zmarła","1953 (drzewo)"]],ev:["m1893","b1911","m1865"],note:"W drzewie było „Dąbska”. Oba akty mówią: Dąbkowska."},
   24:{n:"Walenty Kokociński",y:"ur. ok. 1880",s:"confirmed",f:[["Mieszkał","Pustelnik, gospodarz, 1917"],["Zmarł","Jaszkowo (drzewo)"]],ev:["b1917"]},
   25:{n:"Józefa Żeśko",y:"1887–1980",s:"confirmed",f:[["Urodzona","19 III 1887, Tykadłów"],["Mieszkała","Pustelnik, 1917"],["Zmarła","10 XII 1980, gmina Brodnica (USC Brodnica 57/1980)"]],ev:["b1887","b1917"],note:"W aktach także Żyśko i Rześko. Ślub z Walentym przed 1915 rokiem; ta księga jest w archiwum w Sieradzu."},
@@ -388,14 +405,14 @@ const P = {
   85:{n:"Elżbieta Gnerowicz(?)",y:"żyła 1865",s:"confirmed",nw:true,f:[["1865","Tykadłów"]],ev:["m1865"],note:"Matka Ludwika Dąbkowskiego. Nazwisko panieńskie trudne do odczytania."},
   86:{n:"Wojciech Kurz(?)",y:"zm. przed 1865",s:"confirmed",nw:true,f:[["Mieszkał","Russów"]],ev:["m1865"],note:"Ojciec Agnieszki. Nazwisko trudne do odczytania."},
   87:{n:"Maryanna",y:"zm. przed 1865",s:"confirmed",nw:true,f:[["Mieszkała","Russów"]],ev:["m1865"],note:"Matka Agnieszki. Nazwisko panieńskie nieczytelne."},
-  200:{n:"Joachim Rześko",y:"zm. przed 1852",s:"confirmed",nw:true,f:[["Mieszkał","Tykadłów (?)"]],note:"Ojciec Wawrzyńca, wymieniony w akcie ślubu syna (Tykadłów 1852, akt 15). W 1852 roku już nie żył. W starszych aktach nazwisko pisano Rześko, później Żeśko i Żyśko."},
-  201:{n:"Maryanna",y:"zm. przed 1852",s:"confirmed",nw:true,f:[],note:"Matka Wawrzyńca Rześki (Tykadłów 1852, akt 15). Nazwiska panieńskiego akt nie podaje."},
+  200:{n:"Joachim Rześko",y:"ok. 1780 – przed 1852",s:"confirmed",nw:true,f:[["1826","komornik w Tykadłowie, lat 46"]],note:"Ojciec Wawrzyńca, wymieniony w akcie ślubu syna (Tykadłów 1852, akt 15). W 1852 roku już nie żył. W starszych aktach nazwisko pisano Rześko, później Żeśko i Żyśko."},
+  201:{n:"Maryanna Zakrocka",y:"ok. 1788 – przed 1852",s:"likely",nw:true,f:[["1826","lat 38, Tykadłów"]],note:"Matka Wawrzyńca Rześki (Tykadłów 1852, akt 15). Nazwisko panieńskie Zakrocka podaje akt urodzenia jej córki Anny (Tykadłów 1826, akt 19): Joachim Rześko, komornik, i Maryanna z Zakrockich. To jedyny Joachim Rześko w tutejszych księgach, więc to prawie na pewno ta sama para."},
   202:{n:"Józef Chrzanowski",y:"żył 1852",s:"confirmed",nw:true,f:[["1852","komornik w Tykadłowie"]],note:"Ojciec Rozalii (Tykadłów 1852, akt 15)."},
   203:{n:"Tekla",y:"zm. przed 1852",s:"confirmed",nw:true,f:[],note:"Matka Rozalii Chrzanowskiej (Tykadłów 1852, akt 15). Nazwiska panieńskiego akt nie podaje."},
 };
 
 const GR_EV = { g0: 0, g1: 1, g2: 2, g3: 3 };
-const LABEL = { confirmed: "Potwierdzone", likely: "Prawdopodobne", tree: "Z drzewa", unknown: "Nieznane" };
+const LABEL = { confirmed: "Potwierdzone", likely: "Prawdopodobne", tree: "Potwierdzone przez rodzinę", unknown: "Nieznane" };
 
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const NS = "http://www.w3.org/2000/svg";

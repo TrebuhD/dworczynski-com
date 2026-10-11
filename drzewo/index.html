@@ -705,7 +705,7 @@ function bus(S, dropX, row, anchors, dy = 0) {  // from the parents' midpoint do
   S.lines.push([dropX, y0, dropX, yb], [Math.min(dropX, ...anchors), yb, Math.max(dropX, ...anchors), yb]);
   anchors.forEach(a => S.lines.push([a, yb, a, y1]));
 }
-const kidsOpen = (p, depth) => (depth < 2) !== TS.down.has(p);
+const kidsOpen = (p, depth) => (depth < KIDG) !== TS.down.has(p);
 function descShape(p, row, depth, line = false) {  // p with spouses (first marriage left when there are two or more), each marriage's children below it
   const S = newShape(), fams = famsOf[p] || [], ym = row * RH + BH / 2;
   const sp = uniq(fams.map(f => F[f].p.find(x => x !== p)).filter(Boolean));
@@ -752,7 +752,7 @@ function sibShape(x, row, side, depth) {  // x with brothers and sisters, x inne
   }
   const all = [...hl, ...order, ...hr];
   const [S, anchors] = packRow(all.map(s => {
-    if (s !== x) return descShape(s, row, depth <= SIBG ? 0 : 9);  // aunts, uncles, cousins and their children unfolded by default
+    if (s !== x) return descShape(s, row, depth <= SIBG ? 0 : 9);  // siblings' families unfolded by default
     if (isC) return descShape(x, row, 0, true);
     const L = newShape(); box(L, x, 0, row, { line: true }); L.anchor = BW / 2; return L;
   }));
@@ -767,7 +767,7 @@ function sibShape(x, row, side, depth) {  // x with brothers and sisters, x inne
   }
   return S;
 }
-const UPG = 2, SIBG = 1;
+const UPG = Infinity, SIBG = Infinity, KIDG = Infinity;  // every branch unfolded by default; chips fold them
 function lineShape(x, row, side, depth) {  // x's siblings row, then parents' blocks above, joined by a bus
   const S = sibShape(x, row, side, depth);
   const fa = father(x), mo = mother(x);

@@ -245,6 +245,8 @@ ul.points { padding-left: 1.2em; margin: 0; }
 .srcs-box summary { font-size: 0.95rem; }
 .b-short { display: none; }
 @media (max-width: 480px) { .b-long { display: none; } .b-short { display: inline; } .links .l-tree { display: none; } }
+.how ul { margin: 6px 0 0; padding-left: 1.1em; font-size: 0.95rem; }
+.how li { margin: 4px 0; }
 
 /* map page (mapa/): OpenStreetMap with people per year, timeline at the bottom, the tree page's panel on the side */
 :root { --side-o: #2a78d6; --side-m: #eb6834; --side-x: #1baf7a; --halo: #ffffff; --tile-filter: saturate(.45) contrast(.94) brightness(1.03); }
@@ -582,9 +584,10 @@ function panelParts(id) {  // person panel content: {top, body, fam}; both pages
     const src = (p.src || []).map(s => `<li>${esc(s.t)}${s.c ? `<br><span class="soft">${esc(s.c)}</span>` : ""}${s.u ? `<br><a href="${esc(s.u)}" target="_blank" rel="noopener">zobacz w archiwum<span class="vh"> (nowa karta)</span></a>` : ""}</li>`).join("");
     body = `${facts ? `<dl class="facts">${facts}</dl>` : ""}
       ${p.note ? `<p class="note">${esc(p.note)}</p>` : ""}
-      ${famBlock}
+      ${p.how && p.how.length ? `<details class="how"><summary>Jak to ustaliliśmy</summary><ul>${p.how.map(t => `<li>${esc(t)}</li>`).join("")}</ul></details>` : ""}
       ${stories ? `<h3>Historie</h3><ul class="stories">${stories}</ul>` : ""}
       ${docs || graves ? `<h3>Dokumenty</h3>${docs ? `<div class="thumbs">${docs}</div>` : ""}${graves ? `<ul class="graves">${graves}</ul>` : ""}` : ""}
+      ${famBlock}
       ${src ? `<details class="srcs-box"><summary>Źródła (${(p.src || []).length})</summary><ul class="srcs">${src}</ul></details>` : ""}`;
   }
   return { top: `${alt(id) ? `<p class="alt">${esc(alt(id))}</p>` : ""}${relLine(id) ? `<p class="rel">${esc(relLine(id))}</p>` : ""}`, body, fam: "" };

@@ -1,3 +1,5 @@
 /docs/* / 302
 /tools/* / 302
 /README.md / 302
+/drzewo/osiem-drog /drzewo/mapa/ 301
+/drzewo/osiem-drog/* /drzewo/mapa/ 301

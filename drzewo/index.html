@@ -1061,8 +1061,16 @@ function bindChart() {
   document.querySelectorAll('input[name="view"]').forEach(r => r.addEventListener("change", () => {
     view = r.value;
     try { localStorage.setItem("drzewo-view", view); } catch (e) {}
+    history.pushState(null, "", viewUrl());
     render(true);
   }));
+  addEventListener("popstate", () => {  // back/forward between ?widok=drzewo and the fan
+    const v = urlView();
+    if (v === view) return;
+    view = v;
+    document.querySelectorAll('input[name="view"]').forEach(r => { r.checked = r.value === view; });
+    if (M && !$("#tree-view").hidden) render(true);
+  });
 }
 // select: show in the panel, centre only when the person is not on the chart; centreOn: put in the middle
 let pendingCentre = false;
@@ -1179,8 +1187,20 @@ function route() {
   document.title = (id === ROOT ? "" : full(id) + " · ") + SITE;
   showPerson(id, !M || wasHidden, name !== "osoba");
 }
+// view lives in the URL: ?widok=drzewo is the box tree, no parameter is the fan
+const urlView = () => new URLSearchParams(location.search).get("widok") === "drzewo" ? "tree" : "fan";
+function viewUrl() {
+  const q = new URLSearchParams(location.search);
+  if (view === "tree") q.set("widok", "drzewo"); else q.delete("widok");
+  const qs = q.toString();
+  return location.pathname + (qs ? "?" + qs : "") + location.hash;
+}
 function init() {
-  try { const v = localStorage.getItem("drzewo-view"); if (v === "fan" || v === "tree") view = v; } catch (e) {}
+  if (new URLSearchParams(location.search).has("widok")) view = urlView();
+  else {  // bare URL: fall back to the last view used, and show it in the address bar
+    try { const v = localStorage.getItem("drzewo-view"); if (v === "fan" || v === "tree") view = v; } catch (e) {}
+    if (view === "tree") history.replaceState(null, "", viewUrl());
+  }
   document.querySelectorAll('input[name="view"]').forEach(r => { r.checked = r.value === view; });
   bindChart();
   bindSearch(select, markFound);

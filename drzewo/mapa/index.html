@@ -103,6 +103,10 @@ main { min-height: 0; position: relative; }
 .node.sel .seg { stroke: var(--stamp); stroke-width: 4; }
 .lab { fill: var(--seg-text); font-family: var(--font-body); pointer-events: none; }
 .lab .b { font-weight: 700; }
+.node, .lab, #segs .empty, .tline, .chip { transition: opacity .15s ease-out; }
+#segs.searching .empty, #segs.searching .tline, #segs.searching .chip, .node.miss, .lab.miss { opacity: 0.22; }
+.node.hit .seg { stroke: var(--stamp); stroke-width: 4; }
+.tnode.hit .box { stroke: var(--stamp); stroke-width: 3; fill: color-mix(in srgb, var(--stamp) 18%, var(--leaf)); }
 .tools { position: absolute; left: 12px; right: 12px; top: 10px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-start; justify-content: space-between; pointer-events: none; }
 .tools > * { pointer-events: auto; }
 .modes { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
@@ -612,7 +616,7 @@ function panelParts(id) {  // person panel content: {top, body, fam}; both pages
 function panelHead(id) { $("#p-name").textContent = full(id); $("#p-sub").innerHTML = `${esc(yrs(id))} ${word(stOf(id))}`; }
 
 // ---------- search
-function bindSearch(onPick) {
+function bindSearch(onPick, onType = () => {}) {  // onType gets every match while typing, null when the query clears
   const q = $("#q"), res = $("#q-res");
   const all = Object.keys(P).map(id => [id, fold([full(id), P[id].m, P[id].by].filter(Boolean).join(" "))]);
   let hits = [], act = -1;
@@ -622,17 +626,19 @@ function bindSearch(onPick) {
     res.hidden = false; q.setAttribute("aria-expanded", "true");
     if (act >= 0) q.setAttribute("aria-activedescendant", "qo-" + act); else q.removeAttribute("aria-activedescendant");
   };
-  const pick = id => { q.value = ""; close(); onPick(id); };
+  const pick = id => { q.value = ""; close(); onType(null); onPick(id); };
   q.addEventListener("input", () => {
     const t = fold(q.value.trim()).split(/\s+/).filter(Boolean);
-    if (!t.length) { close(); return; }
-    hits = all.filter(([, s]) => t.every(w => s.includes(w))).map(([id]) => id).sort(byBirth).slice(0, 12);
+    if (!t.length) { close(); onType(null); return; }
+    const found = all.filter(([, s]) => t.every(w => s.includes(w))).map(([id]) => id);
+    onType(new Set(found));
+    hits = found.sort(byBirth).slice(0, 12);
     act = hits.length ? 0 : -1; paint();
   });
   q.addEventListener("keydown", e => {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { if (!hits.length) return; e.preventDefault(); act = (act + (e.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length; paint(); }
     else if (e.key === "Enter") { if (act >= 0 && hits[act]) { e.preventDefault(); pick(hits[act]); } }
-    else if (e.key === "Escape") { q.value = ""; close(); }
+    else if (e.key === "Escape") { q.value = ""; close(); onType(null); }
   });
   res.addEventListener("pointerdown", e => e.preventDefault());
   res.addEventListener("click", e => { const li = e.target.closest("[data-id]"); if (li) pick(li.dataset.id); });

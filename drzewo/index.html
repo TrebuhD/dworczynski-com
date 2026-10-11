@@ -102,6 +102,10 @@ main { min-height: 0; position: relative; }
 .node.sel .seg { stroke: var(--stamp); stroke-width: 4; }
 .lab { fill: var(--seg-text); font-family: var(--font-body); pointer-events: none; }
 .lab .b { font-weight: 700; }
+.node, .lab, #segs .empty, .tline, .chip { transition: opacity .15s ease-out; }
+#segs.searching .empty, #segs.searching .tline, #segs.searching .chip, .node.miss, .lab.miss { opacity: 0.22; }
+.node.hit .seg { stroke: var(--stamp); stroke-width: 4; }
+.tnode.hit .box { stroke: var(--stamp); stroke-width: 3; fill: color-mix(in srgb, var(--stamp) 18%, var(--leaf)); }
 .tools { position: absolute; left: 12px; right: 12px; top: 10px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-start; justify-content: space-between; pointer-events: none; }
 .tools > * { pointer-events: auto; }
 .modes { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
@@ -513,7 +517,7 @@ function panelParts(id) {  // person panel content: {top, body, fam}; both pages
 function panelHead(id) { $("#p-name").textContent = full(id); $("#p-sub").innerHTML = `${esc(yrs(id))} ${word(stOf(id))}`; }
 
 // ---------- search
-function bindSearch(onPick) {
+function bindSearch(onPick, onType = () => {}) {  // onType gets every match while typing, null when the query clears
   const q = $("#q"), res = $("#q-res");
   const all = Object.keys(P).map(id => [id, fold([full(id), P[id].m, P[id].by].filter(Boolean).join(" "))]);
   let hits = [], act = -1;
@@ -523,17 +527,19 @@ function bindSearch(onPick) {
     res.hidden = false; q.setAttribute("aria-expanded", "true");
     if (act >= 0) q.setAttribute("aria-activedescendant", "qo-" + act); else q.removeAttribute("aria-activedescendant");
   };
-  const pick = id => { q.value = ""; close(); onPick(id); };
+  const pick = id => { q.value = ""; close(); onType(null); onPick(id); };
   q.addEventListener("input", () => {
     const t = fold(q.value.trim()).split(/\s+/).filter(Boolean);
-    if (!t.length) { close(); return; }
-    hits = all.filter(([, s]) => t.every(w => s.includes(w))).map(([id]) => id).sort(byBirth).slice(0, 12);
+    if (!t.length) { close(); onType(null); return; }
+    const found = all.filter(([, s]) => t.every(w => s.includes(w))).map(([id]) => id);
+    onType(new Set(found));
+    hits = found.sort(byBirth).slice(0, 12);
     act = hits.length ? 0 : -1; paint();
   });
   q.addEventListener("keydown", e => {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { if (!hits.length) return; e.preventDefault(); act = (act + (e.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length; paint(); }
     else if (e.key === "Enter") { if (act >= 0 && hits[act]) { e.preventDefault(); pick(hits[act]); } }
-    else if (e.key === "Escape") { q.value = ""; close(); }
+    else if (e.key === "Escape") { q.value = ""; close(); onType(null); }
   });
   res.addEventListener("pointerdown", e => e.preventDefault());
   res.addEventListener("click", e => { const li = e.target.closest("[data-id]"); if (li) pick(li.dataset.id); });
@@ -577,7 +583,7 @@ function viewer(k, ret) {
 // Tree page: fan and box-tree views, side panel, pages. Shared code is in core.js.
 // ---------- state: one person in the centre, one selected (shown in the panel)
 let view = "fan", centre = null, sel = null;
-let M = null, vt = { s: 1, x: 0, y: 0 }, focusIdx = 0, stageW = 0, stageH = 0, topInset = 0;
+let M = null, found = null, vt = { s: 1, x: 0, y: 0 }, focusIdx = 0, stageW = 0, stageH = 0, topInset = 0;
 const TS = { up: new Set(), sib: new Set(), down: new Set() };  // tree branches folded or unfolded against the default
 
 // ---------- fan: ancestors above, descendants below
@@ -640,7 +646,7 @@ function fanLabels() {
   for (const sg of M.items) {
     if (!sg.id) continue;
     const p = P[sg.id], given = first(sg.id) || "N.N.", sur = p.s || "", ini = sur ? sur[0] + "." : "", y = chartYrs(sg.id);
-    const cls = `lab t-${stOf(sg.id)}`;
+    const cls = `lab t-${stOf(sg.id)}${found ? (found.has(sg.id) ? " hit" : " miss") : ""}`;
     if (sg.kind === "c") {
       const fpx = 14, f = fpx / s, w = R0 * 1.75 * s;
       const lines = ([[given, sur, y], [given, sur], [given]].find(o => o.filter(Boolean).every((t, k) => t.length * (k === 2 ? fpx * 0.85 : fpx) * TW <= w)) || []).filter(Boolean);
@@ -815,8 +821,19 @@ function draw(animate) {
   if (animate && !REDUCED.matches) { const l = g.parentNode; l.classList.remove("enter"); void l.getBBox(); l.classList.add("enter"); }
 }
 function markSel() {
-  document.querySelectorAll("#segs .node.sel").forEach(n => n.classList.remove("sel"));
-  document.querySelectorAll("#segs .node").forEach(n => { if (M.items[+n.dataset.i].id === sel) n.classList.add("sel"); });
+  document.querySelectorAll("#segs .node").forEach(n => {
+    const id = M.items[+n.dataset.i].id;
+    n.classList.toggle("sel", id === sel);
+    n.classList.toggle("hit", !!found && found.has(id));
+    n.classList.toggle("miss", !!found && !found.has(id));
+  });
+  $("#segs").classList.toggle("searching", !!found);
+}
+function markFound(ids) {  // search box: outline matches on the chart, fade the rest
+  found = ids;
+  if (!M || $("#tree-view").hidden) return;
+  markSel();
+  if (M.kind === "fan") fanLabels();
 }
 function applyVt() { $("#vp").setAttribute("transform", `translate(${vt.x.toFixed(1)},${vt.y.toFixed(1)}) scale(${vt.s.toFixed(4)})`); }
 let labelRaf = 0;
@@ -1126,7 +1143,7 @@ function init() {
   try { const v = localStorage.getItem("drzewo-view"); if (v === "fan" || v === "tree") view = v; } catch (e) {}
   document.querySelectorAll('input[name="view"]').forEach(r => { r.checked = r.value === view; });
   bindChart();
-  bindSearch(select);
+  bindSearch(select, markFound);
   $("#legend-btn").addEventListener("click", e => { const open = !$(".tools").classList.contains("legend-open"); $(".tools").classList.toggle("legend-open", open); e.currentTarget.setAttribute("aria-expanded", String(open)); });
   $("#p-toggle").addEventListener("click", () => openSheet(!$("#panel").classList.contains("open")));
   $(".brand").addEventListener("click", e => {  // brand link always resets the tree to Hubert, default folds and zoom

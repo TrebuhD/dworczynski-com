@@ -1023,7 +1023,7 @@ PAGES.dokumenty = () => ({ title: "Dokumenty", html: `${back()}<h1 tabindex="-1"
   </ul></section>` });
 
 // ---------- router
-let lastTree = "#/", viewerReturn = "#/";
+let lastTree = "#/", viewerReturn = "#/", resetNext = false;
 function route() {
   const parts = location.hash.replace(/^#\/?/, "").split("/").map(decodeURIComponent);
   const name = parts[0] || "";
@@ -1048,6 +1048,7 @@ function route() {
   const id = name === "osoba" && P[parts[1]] ? parts[1] : ROOT;
   lastTree = name === "osoba" ? location.hash : "#/";
   const wasHidden = $("#tree-view").hidden;
+  if (resetNext) { resetNext = false; TS.up.clear(); TS.sib.clear(); TS.down.clear(); $("#page").hidden = true; $("#page").innerHTML = ""; $("#tree-view").hidden = false; document.querySelectorAll(".links a").forEach(a => a.removeAttribute("aria-current")); document.title = SITE; showPerson(ROOT, true); return; }
   $("#page").hidden = true; $("#page").innerHTML = "";
   $("#tree-view").hidden = false;
   document.querySelectorAll(".links a").forEach(a => a.removeAttribute("aria-current"));
@@ -1060,6 +1061,10 @@ function init() {
   bindChart();
   bindSearch(select);
   $("#p-toggle").addEventListener("click", () => openSheet(!$("#panel").classList.contains("open")));
+  $(".brand").addEventListener("click", e => {  // brand link always resets the tree to Hubert, default folds and zoom
+    e.preventDefault(); resetNext = true;
+    if (location.hash === "#/") route(); else location.hash = "#/";
+  });
   document.addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
     if (!$("#viewer-root").hidden) location.hash = viewerReturn;

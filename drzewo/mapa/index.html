@@ -430,7 +430,7 @@ ul.points { padding-left: 1.2em; margin: 0; }
 .small { font-size: .9rem; }
 .evs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.map-actions .centre-btn { display: inline-flex; align-items: center; text-decoration: none; }
+.map-actions .centre-btn, .map-actions a.ghost-btn { display: inline-flex; align-items: center; text-decoration: none; }
 .stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .stop { width: 100%; display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 0 10px; text-align: left; padding: 6px 10px; min-height: 44px; border-radius: 8px;
   border: 1px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; font: inherit; }
@@ -440,6 +440,22 @@ ul.points { padding-left: 1.2em; margin: 0; }
 .stop .pl { font-weight: 500; }
 .stop .k { font-size: .88rem; color: var(--ink-soft); }
 @media (max-width: 480px) { .links a[href="../"] { display: none; } }  /* the site name already links to the tree */
+
+/* year panel: places fold open; the year's events are already in the box on the map */
+@media (min-width: 900px) { .evs-year { display: none; } }
+.pl-folds { display: grid; gap: 4px; }
+.pl-fold summary { cursor: pointer; padding: 8px 10px; min-height: 40px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); font-weight: 500; list-style: none; }
+.pl-fold summary::-webkit-details-marker { display: none; }
+.pl-fold summary::before { content: "›"; display: inline-block; width: 1em; color: var(--ink-soft); transition: transform .15s; }
+.pl-fold[open] summary::before { transform: rotate(90deg); }
+.pl-fold summary:hover { border-color: var(--stamp); }
+.pl-fold .plinks { margin: 6px 0 8px; }
+#hist { pointer-events: auto; cursor: pointer; }
+
+/* "Skąd pochodzą przodkowie" */
+.roots-mode .tl, .roots-mode #ticker, .roots-mode #hints { display: none; }
+.rt { fill: none; stroke: var(--side); opacity: .75; stroke-linecap: round; }
+.roots .pd .dot { stroke: var(--ink); }
 </style>
 </head>
 <body>
@@ -819,8 +835,11 @@ for (const id of IDS) for (const s of TR[id].st) {
   (EVENTS[Math.floor(s.y)] ||= []).push({ k: s.k, id, r: s.k === "slub" ? s.r : null, p: s.p, y: s.y });
 }
 for (const y in EVENTS) EVENTS[y].sort((a, b) => a.y - b.y);
+const NAMEN = {};
+for (const id in P) NAMEN[full(id)] = (NAMEN[full(id)] || 0) + 1;
+const nameY = id => full(id) + (NAMEN[full(id)] > 1 && P[id].by ? ` (ur. ${P[id].by})` : "");  // two Piotr Hojkas: add the birth year
 const evLine = e => {
-  const who = id => P[id] ? `<a href="#/osoba/${encodeURIComponent(id)}">${esc(full(id))}</a>` : "";
+  const who = id => P[id] ? `<a href="#/osoba/${encodeURIComponent(id)}">${esc(nameY(id))}</a>` : "";
   const what = e.k === "ur" ? "urodzenie" : e.k === "zm" ? "śmierć" : "ślub";
   return `<span class="ev-k k-${e.k}">${what}</span> ${who(e.id)}${e.r ? " i " + who(e.r) : ""}<span class="soft">, ${esc(short(e.p))}</span>`;
 };
@@ -849,7 +868,7 @@ const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, t
 const ov = svgEl("svg", { class: "ov", "aria-hidden": "true" });
 map.getContainer().appendChild(ov);
 const gTrail = svgEl("g", { class: "trails" }, ov), gPath = svgEl("g", { class: "selpath" }, ov), gDots = svgEl("g", { class: "dots" }, ov),
-  gClus = svgEl("g", { class: "clusters" }, ov), gLab = svgEl("g", { class: "plabels" }, ov), gStops = svgEl("g", { class: "selstops" }, ov);
+  gClus = svgEl("g", { class: "clusters" }, ov), gRoots = svgEl("g", { class: "roots" }, ov), gLab = svgEl("g", { class: "plabels" }, ov), gStops = svgEl("g", { class: "selstops" }, ov);
 const trailPath = { o: svgEl("path", { class: "trail s-o" }, gTrail), m: svgEl("path", { class: "trail s-m" }, gTrail), x: svgEl("path", { class: "trail s-x" }, gTrail) };
 const hints = $("#hints");
 const dotEl = {}, labEl = {};
@@ -907,9 +926,11 @@ function drawClusters(units) {
   for (let i = cl.length; i < clEl.length; i++) clEl[i].style.display = "none";
 }
 const clusterTip = u => `<b>${esc(short(u.m[0].p))} i okolice</b> <span>${u.n} ${u.n % 10 >= 2 && u.n % 10 <= 4 && (u.n % 100 < 10 || u.n % 100 >= 20) ? "osoby" : "osób"}</span><br><span>${u.m.map(q => esc(short(q.p)) + " " + q.ids.length).join(", ")}</span><br><span>Kliknij, żeby przybliżyć.</span>`;
-let t = 1880, playing = false, speed = 1, sel = null, showTrails = true, lastPanelKey = "", lastFrame = null;
+let t = 1880, playing = false, speed = 1, sel = null, roots = null, showTrails = true, lastPanelKey = "", lastFrame = null;
 
 function frame() {
+  if (roots) { drawRoots(); return; }
+  gRoots.replaceChildren();
   const vis = [], groups = new Map(), size = map.getSize();
   for (const id of ORDER) { const s = stateAt(id, t); if (s) { vis.push([id, s]); if (!s.to) (groups.get(s.p) || groups.set(s.p, []).get(s.p)).push(id); } }
   const pos = {}, units = clusterPlaces(groups), merged = new Set(units.filter(u => u.m.length > 1).flatMap(u => u.ids));
@@ -956,6 +977,7 @@ function frame() {
     let prev = null;
     for (let i = 0; i <= s.i; i++) {
       const pl = tr.st[i].p; if (pl === prev) continue;
+      if (!prev && tr.st.slice(0, s.i + 1).some(q => q.p !== pl)) { const a = px(pl); dpath[tr.s] += `M${(a.x - 3).toFixed(1)},${a.y.toFixed(1)}a3,3 0 1,0 6,0a3,3 0 1,0 -6,0`; }  // where the trail starts
       if (prev) { const a = px(prev), b = px(pl), dx = b.x - a.x, dy = b.y - a.y, L2 = Math.hypot(dx, dy) || 1, bend = Math.min(0.16 * L2, 50);
         dpath[tr.s] += `M${a.x.toFixed(1)},${a.y.toFixed(1)}Q${((a.x + b.x) / 2 - dy / L2 * bend).toFixed(1)},${((a.y + b.y) / 2 + dx / L2 * bend).toFixed(1)} ${b.x.toFixed(1)},${b.y.toFixed(1)}`; }
       prev = pl;
@@ -1018,9 +1040,11 @@ function drawHints(groups, size) {  // places with people now that lie outside t
     return b;
   }));
   const mc = map.getContainer().getBoundingClientRect(), tk = ticker.hidden ? null : ticker.getBoundingClientRect(), kept = [];
+  const zc = $(".leaflet-control-zoom").getBoundingClientRect();
   for (const b of hints.children) {  // keep chips inside the map and clear of the event box
     const w = b.offsetWidth / 2 + 8, h = b.offsetHeight / 2 + 8, x = Math.max(w, Math.min(size.x - w, parseFloat(b.style.left)));
-    const top = tk && x - w < tk.right - mc.left ? tk.bottom - mc.top + h - 4 : h;
+    let top = tk && x - w < tk.right - mc.left ? tk.bottom - mc.top + h - 4 : h;
+    if (x - w < zc.right - mc.left) top = Math.max(top, zc.bottom - mc.top + h - 4);  // clear of the zoom buttons
     const y = Math.max(top, Math.min(bottom - h, parseFloat(b.style.top)));
     b.style.left = x + "px"; b.style.top = y + "px";
     if (kept.some(o => Math.abs(o.x - x) < o.w + w - 16 && Math.abs(o.y - y) < o.h + h - 16)) b.hidden = true; else kept.push({ x, y, w, h });
@@ -1037,7 +1061,9 @@ function updateYear() {
   slider.setAttribute("aria-valuetext", `rok ${y}, ${eraOf(t)}`);
   const evs = (EVENTS[y] || []);
   const tk = `${y}:${evs.length}`;
-  if (ticker.dataset.k !== tk) { ticker.dataset.k = tk; ticker.innerHTML = evs.slice(0, 4).map(e => `<li>${evLine(e)}</li>`).join("") + (evs.length > 4 ? `<li class="soft">i ${evs.length - 4} więcej</li>` : ""); ticker.hidden = !evs.length; }
+  if (ticker.dataset.k !== tk) { ticker.dataset.k = tk; const late = y >= PLAY_END;
+    ticker.innerHTML = evs.slice(0, 4).map(e => `<li>${evLine(e)}</li>`).join("") + (evs.length > 4 ? `<li class="soft">i ${evs.length - 4} więcej</li>` : "") + (late ? `<li class="soft">${LIVING_NOTE}</li>` : "");
+    ticker.hidden = !evs.length && !late; }
   if (!sel) yearPanel();
 }
 function drawHist() {
@@ -1053,15 +1079,19 @@ function drawHist() {
   for (let y = Math.ceil(Y0 / step) * step; y <= Y1; y += step) h += `<text class="tick" x="${X(y).toFixed(1)}" y="${H - 26}" text-anchor="middle">${y}</text>`;
   for (const [y, lab] of MARKS) h += `<line class="mark" x1="${X(y).toFixed(1)}" x2="${X(y).toFixed(1)}" y1="12" y2="${H}"><title>${lab}</title></line>`;
   svg.innerHTML = h;
+  svg.onclick = e => { const r = svg.getBoundingClientRect(), y = Math.round(Y0 + (e.clientX - r.left - 9) / (r.width - 18) * (Y1 - Y0));
+    if (playing) setPlaying(false); t = Math.max(Y0, Math.min(Y1, y)) + 0.5; frame(); };
 }
 let raf = 0, tPrev = 0;
 const RATE = 2.5;  // years per second at 1×
+const PLAY_END = 1990, LIVING_NOTE = "Osoby żyjące pominięto, dlatego mapa pustoszeje.";
 function loop(now) {
   if (!playing) return;
   const dt = Math.min(0.1, (now - tPrev) / 1000); tPrev = now;
-  t = Math.min(Y1, t + dt * RATE * speed);
+  const end = t < PLAY_END + 0.5 ? PLAY_END + 0.5 : Y1;  // stop once at 1990; play again to go on
+  t = Math.min(end, t + dt * RATE * speed);
   frame();
-  if (t >= Y1) setPlaying(false); else raf = requestAnimationFrame(loop);
+  if (t >= end) setPlaying(false); else raf = requestAnimationFrame(loop);
 }
 function setPlaying(on) {
   playing = on;
@@ -1077,6 +1107,14 @@ slider.addEventListener("input", () => { if (playing) setPlaying(false); t = +sl
 $("#stage").addEventListener("keydown", e => {
   if (e.target.closest("input:not([type=range]), button, a")) return;
   if (e.key === " " || e.key === "k") { e.preventDefault(); setPlaying(!playing); }
+});
+document.addEventListener("keydown", e => {
+  if (roots || e.altKey || e.ctrlKey || e.metaKey || e.target.closest("input, textarea, select, #map, #viewer-root:not([hidden])")) return;
+  const step = { ArrowLeft: -1, ArrowRight: 1, PageDown: -10, PageUp: 10 }[e.key] * (e.shiftKey ? 10 : 1);
+  const to = e.key === "Home" ? Y0 : e.key === "End" ? Y1 : step ? Math.floor(t) + step : null;
+  if (to == null) return;
+  e.preventDefault(); if (playing) setPlaying(false);
+  t = Math.max(Y0, Math.min(Y1, to)) + 0.5; frame();
 });
 
 // ---------- hover and click on dots
@@ -1115,14 +1153,17 @@ function yearPanel() {
   $("#p-sub").textContent = eraOf(t);
   const n = lf.vis.length, evs = EVENTS[y] || [];
   const places = [...lf.groups].sort((a, b) => b[1].length - a[1].length).map(([p, ids]) =>
-    `<h3>${esc(short(p))} <span class="cnt">${ids.length}</span></h3><ul class="plinks">${ids.map(id => pbtn(id, SIDE_N[TR[id].s])).join("")}</ul>`).join("");
-  const moving = lf.vis.filter(([, s]) => s.to).map(([id, s]) => `<li>${esc(full(id))}: ${esc(short(s.p))} → ${esc(short(s.to))}</li>`).join("");
+    `<details class="pl-fold" data-p="${esc(p)}"${openPl.has(p) ? " open" : ""}><summary><span>${esc(short(p))}</span> <span class="cnt">${ids.length}</span></summary><ul class="plinks">${ids.map(id => pbtn(id, SIDE_N[TR[id].s])).join("")}</ul></details>`).join("");
+  const moving = lf.vis.filter(([, s]) => s.to).map(([id, s]) => `<li>${esc(nameY(id))}: ${esc(short(s.p))} → ${esc(short(s.to))}</li>`).join("");
   $("#panel-body").innerHTML = `<p class="lede-map">Na mapie: <b>${n}</b> ${n === 1 ? "osoba" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? "osoby" : "osób"} z drzewa, w miejscach, które podają akty. Kliknij kropkę albo imię, żeby przeczytać o osobie.</p>
     ${legendHTML()}
-    ${evs.length ? `<h3>W ${y} roku</h3><ul class="evs">${evs.map(e => `<li>${evLine(e)}</li>`).join("")}</ul>` : ""}
+    ${evs.length ? `<div class="evs-year"><h3>W ${y} roku</h3><ul class="evs">${evs.map(e => `<li>${evLine(e)}</li>`).join("")}</ul></div>` : ""}
     ${moving ? `<h3>W drodze</h3><ul class="evs">${moving}</ul>` : ""}
-    ${places}`;
+    ${y >= PLAY_END ? `<p class="soft small">${LIVING_NOTE}</p>` : ""}
+    ${places ? `<h3>Gdzie są</h3><div class="pl-folds">${places}</div>` : ""}`;
+  $("#panel-body").querySelectorAll(".pl-fold").forEach(d => d.addEventListener("toggle", () => { d.open ? openPl.add(d.dataset.p) : openPl.delete(d.dataset.p); }));
 }
+const openPl = new Set();
 function legendHTML() {
   return `<ul class="mlegend">
     <li><span class="lg s-o"></span>strona ojca</li><li><span class="lg s-m"></span>strona matki</li><li><span class="lg s-x"></span>przez małżeństwo</li>
@@ -1141,7 +1182,7 @@ function personPanel(id) {
   const num = tr ? visits(id).num : [];
   const stops = tr ? tr.st.map((s, i) => `<li><button type="button" class="stop" data-i="${i}"><span class="y"><span class="sn" aria-label="miejsce ${num[i]} na mapie">${num[i]}</span>${Math.floor(s.y)}</span><span class="pl">${esc(short(s.p))}</span><span class="k">${esc(KINDN[s.k])}${s.r && P[s.r] ? ": " + esc(full(s.r)) : ""}</span></button></li>`).join("") : "";
   $("#panel-body").innerHTML = `${x.top}
-    <div class="map-actions"><a class="centre-btn" href="../#/osoba/${encodeURIComponent(id)}">Pokaż w drzewie</a><button type="button" class="ghost-btn" id="p-close">Wróć do roku</button></div>
+    <div class="map-actions"><a class="centre-btn" href="../#/osoba/${encodeURIComponent(id)}">Pokaż w drzewie</a><button type="button" class="ghost-btn" id="p-close">Wróć do roku</button>${rootsOf(id).some(a => a.gen) ? `<a class="ghost-btn" href="#/korzenie/${encodeURIComponent(id)}">Skąd pochodzą przodkowie</a>` : ""}</div>
     ${tr ? `<h3>Miejsca w aktach</h3><ol class="stops">${stops}</ol>` : `<p class="soft">Akty nie podają dla tej osoby miejsca z datą, więc nie ma jej na mapie.</p>`}
     ${x.body}${x.fam}`;
   $("#panel-body").scrollTop = 0;
@@ -1158,8 +1199,7 @@ function select(id) {
   lastPanelKey = "";
   const tr = TR[id];
   if (tr) {
-    if (!stateAt(id, t)) { if (playing) setPlaying(false); t = tr.st[0].y + 0.01; }
-    const s = stateAt(id, t);
+    if (!stateAt(id, t)) { if (playing) setPlaying(false); t = tr.st.reduce((a, s) => Math.abs(s.y - t) < Math.abs(a.y - t) ? s : a).y + 0.01; }
     frame();
     fitPath(id);
   } else frame();
@@ -1174,6 +1214,74 @@ function openSheet(open) {
   b.querySelector("span").textContent = open ? "Zwiń" : "Szczegóły";
 }
 
+// ---------- "Skąd pochodzą przodkowie": every ancestor with a place, at their birthplace, linked to their child's
+function rootsOf(id) {  // [{id, gen, to}]: to = nearest descendant on the line who has a place
+  const out = [], seen = new Set([id]), q = [{ id, gen: 0, to: null }];
+  while (q.length) {
+    const a = q.shift();
+    out.push(a);
+    const anchor = TR[a.id] ? a.id : a.to;
+    for (const p of parents(a.id)) if (!seen.has(p) && P[p]) { seen.add(p); q.push({ id: p, gen: a.gen + 1, to: anchor }); }
+  }
+  return out.filter(a => TR[a.id]);
+}
+const homeOf = id => TR[id].st.find(s => s.k === "ur") || TR[id].st[0];
+const GEN_N = ["ta osoba", "rodzice", "dziadkowie", "pradziadkowie", "prapradziadkowie", "praprapradziadkowie"];
+const genName = g => GEN_N[g] || `${g}. pokolenie wstecz`;
+function drawRoots() {
+  gRoots.replaceChildren();
+  if (zabOn) { zab.remove(); zabOn = null; }
+  for (const g of Object.values(dotEl)) g.style.display = "none";
+  for (const g of clEl) g.style.display = "none";
+  for (const p in labEl) labEl[p].style.display = "none";
+  for (const k in trailPath) trailPath[k].setAttribute("d", "");
+  gPath.replaceChildren(); gStops.replaceChildren(); hints.replaceChildren();
+  const list = rootsOf(roots), byPlace = new Map(), pos = {};
+  for (const a of list) (byPlace.get(homeOf(a.id).p) || byPlace.set(homeOf(a.id).p, []).get(homeOf(a.id).p)).push(a);
+  for (const [p, as] of byPlace) { const c = px(p); as.forEach((a, k) => { const [dx, dy] = spiral(k); pos[a.id] = [c.x + dx, c.y + dy]; }); }
+  const gl = svgEl("g", {}, gRoots), gd = svgEl("g", {}, gRoots), gt = svgEl("g", {}, gRoots);
+  for (const a of list) {
+    if (!a.to || !pos[a.to]) continue;
+    const [x1, y1] = pos[a.id], [x2, y2] = pos[a.to], dx = x2 - x1, dy = y2 - y1, L2 = Math.hypot(dx, dy) || 1, bend = Math.min(0.16 * L2, 50);
+    svgEl("path", { class: `rt s-${TR[a.id].s}`, "stroke-width": Math.max(1.2, 4 - a.gen * 0.5).toFixed(1),
+      d: `M${x1.toFixed(1)},${y1.toFixed(1)}Q${((x1 + x2) / 2 - dy / L2 * bend).toFixed(1)},${((y1 + y2) / 2 + dx / L2 * bend).toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}` }, gl);
+  }
+  for (const a of list.slice().reverse()) {
+    const g = svgEl("g", { class: `pd anc s-${TR[a.id].s} c-${P[a.id].st}`, "data-id": a.id, transform: `translate(${pos[a.id][0].toFixed(1)},${pos[a.id][1].toFixed(1)})` }, gd);
+    svgEl("circle", { class: "dot", r: a.gen === 0 ? 9 : Math.max(4.5, 8 - a.gen * 0.8) }, g);
+    if (a.gen === 0) svgEl("circle", { class: "sel-halo", r: 14 }, g);
+  }
+  const boxes = [];
+  [...byPlace].sort((a, b) => b[1].length - a[1].length).forEach(([p, as]) => {
+    const c = px(p), r = SP * Math.sqrt(as.length) + 8, txt = short(p), w = txt.length * 6.6 + 6, bx = [c.x - w / 2, c.y - r - 15, c.x + w / 2, c.y - r + 1];
+    if (boxes.some(o => !(bx[2] < o[0] || bx[0] > o[2] || bx[3] < o[1] || bx[1] > o[3]))) return;
+    boxes.push(bx);
+    const e = svgEl("text", { class: "plab" + (UNS.has(p) ? " unsure" : ""), "text-anchor": "middle", x: c.x.toFixed(1), y: (c.y - r - 3).toFixed(1) }, gt);
+    e.textContent = txt;
+  });
+}
+function fitRoots() {
+  const ps = [...new Set(rootsOf(roots).map(a => homeOf(a.id).p))].map(p => PLC[p]);
+  if (ps.length) map.flyToBounds(L.latLngBounds(ps), { padding: [70, 70], maxZoom: 11, duration: REDUCED.matches ? 0 : 0.8 });
+}
+function rootsPanel(id) {
+  const list = rootsOf(id), gens = new Map();
+  for (const a of list) if (a.gen) (gens.get(a.gen) || gens.set(a.gen, []).get(a.gen)).push(a);
+  $("#p-name").textContent = "Skąd pochodzą przodkowie";
+  $("#p-sub").textContent = full(id) + (yrs(id) ? ", " + yrs(id) : "");
+  const far = [...new Set(list.map(a => homeOf(a.id).p))];
+  $("#panel-body").innerHTML = `<p class="lede-map">Każda kropka to przodek w miejscu urodzenia (albo w pierwszym miejscu, które podaje akt). Linia prowadzi do miejsca urodzenia dziecka. Na mapie: <b>${list.length - (TR[id] ? 1 : 0)}</b> przodków z <b>${far.length}</b> miejsc.</p>
+    <div class="map-actions"><a class="centre-btn" href="#/osoba/${encodeURIComponent(id)}">Wróć do osoby</a><a class="ghost-btn" href="#/">Mapa w czasie</a></div>
+    ${[...gens].map(([g, as]) => `<h3>${cap(genName(g))} <span class="cnt">${as.length}</span></h3><ul class="plinks">${as.map(a => { const h = homeOf(a.id); return pbtn(a.id, `${short(h.p)}, ${Math.floor(h.y)}${h.k === "ur" ? "" : " (" + KINDN[h.k] + ")"}`); }).join("")}</ul>`).join("")}
+    <p class="soft small">Przodków bez miejsca w aktach nie ma na mapie; linia biegnie wtedy do najbliższego potomka, którego miejsce znamy.</p>`;
+  $("#panel-body").scrollTop = 0;
+}
+gRoots.addEventListener("pointermove", e => { const g = e.target.closest(".pd"); if (!g) return; const r = $("#stage").getBoundingClientRect(), id = g.dataset.id, h = homeOf(id);
+  tip.innerHTML = `<b>${esc(nameY(id))}</b> <span>${esc(yrs(id))}</span><br><span>${esc(short(h.p))}, ${Math.floor(h.y)} (${esc(KINDN[h.k])})</span>${relLine(id) ? `<br><span>${esc(relLine(id))}</span>` : ""}`;
+  tip.hidden = false; placeTip(e.clientX - r.left, e.clientY - r.top); });
+gRoots.addEventListener("pointerleave", () => { tip.hidden = true; });
+gRoots.addEventListener("click", e => { const g = e.target.closest(".pd"); if (g) { tip.hidden = true; go(g.dataset.id); } });
+
 // ---------- router: #/osoba/id, #/rok/1893, #/dokument/k
 let viewerReturn = "#/";
 function route() {
@@ -1185,6 +1293,11 @@ function route() {
   }
   vr.innerHTML = ""; vr.hidden = true;
   viewerReturn = location.hash || "#/";
+  const wasRoots = roots;
+  roots = parts[0] === "korzenie" && has(P, parts[1]) ? parts[1] : null;
+  $("#stage").classList.toggle("roots-mode", !!roots);
+  if (roots) { if (playing) setPlaying(false); sel = null; document.title = "Skąd pochodzą przodkowie: " + full(roots) + " · Mapa · " + SITE; rootsPanel(roots); frame(); fitRoots(); return; }
+  if (wasRoots) { gRoots.replaceChildren(); lastPanelKey = ""; }
   if (parts[0] === "osoba" && has(P, parts[1])) { document.title = full(parts[1]) + " · Mapa · " + SITE; select(parts[1]); return; }
   sel = null; lastPanelKey = "";
   document.title = "Mapa · " + SITE;

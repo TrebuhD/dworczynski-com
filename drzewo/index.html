@@ -143,6 +143,7 @@ main { min-height: 0; position: relative; }
 .tnode.sel .box { stroke: var(--stamp); stroke-width: 4; }
 .tnode:focus-visible .box { stroke: var(--stamp); stroke-width: 4; stroke-dasharray: 6 3; }
 .tn { font-family: var(--font-body); font-weight: 700; font-size: 14px; fill: var(--ink); pointer-events: none; }
+.tm { font-family: var(--font-body); font-size: 12px; fill: var(--ink-soft); pointer-events: none; }
 .ty { font-family: var(--font-body); font-size: 12.5px; fill: var(--ink-soft); pointer-events: none; font-variant-numeric: tabular-nums; }
 .chip { cursor: pointer; outline: none; }
 .chip rect { fill: var(--paper); stroke: var(--stamp); stroke-width: 1.4; }
@@ -543,7 +544,7 @@ const docsOf = id => uniq([...(P[id].ev || []), ...Object.keys(D.ev).filter(k =>
 // ---------- side panel
 const word = st => `<span class="word ${st}">${WORD[st] || st}</span>`;
 function pbtn(id, extra) {
-  return `<li><a class="pl" href="#/osoba/${encodeURIComponent(id)}"><span class="sw f-${stOf(id)}" aria-hidden="true"></span><span class="nm">${esc(full(id))}</span>${yrs(id) ? `<span class="yr">${esc(yrs(id))}</span>` : ""}${extra ? `<span class="ex">${esc(extra)}</span>` : ""}</a></li>`;
+  return `<li><a class="pl" href="#/osoba/${encodeURIComponent(id)}"><span class="sw f-${stOf(id)}" aria-hidden="true"></span><span class="nm">${esc(full(id))}${P[id].m ? ` (${esc(P[id].m)})` : ""}</span>${yrs(id) ? `<span class="yr">${esc(yrs(id))}</span>` : ""}${extra ? `<span class="ex">${esc(extra)}</span>` : ""}</a></li>`;
 }
 function thumb(k) {
   const e = D.ev[k];
@@ -725,10 +726,11 @@ function fanLabels() {
   for (const sg of M.items) {
     if (!sg.id) continue;
     const p = P[sg.id], given = first(sg.id) || "N.N.", sur = p.s || "", ini = sur ? sur[0] + "." : "", y = chartYrs(sg.id);
+    const both = p.m && sur ? [[given, `${p.m} z d. ${sur}`, y], [given, `${p.m} (${sur})`, y], [given, p.m, "z d. " + sur]] : [];
     const cls = `lab t-${stOf(sg.id)}${found ? (found.has(sg.id) ? " hit" : " miss") : ""}`;
     if (sg.kind === "c") {
       const fpx = 14, f = fpx / s, w = R0 * 1.75 * s;
-      const lines = ([[given, sur, y], [given, sur], [given]].find(o => o.filter(Boolean).every((t, k) => t.length * (k === 2 ? fpx * 0.85 : fpx) * TW <= w)) || []).filter(Boolean);
+      const lines = ([...both, [given, sur, y], [given, sur], [given]].find(o => o.filter(Boolean).every((t, k) => t.length * (k === 2 ? fpx * 0.85 : fpx) * TW <= w)) || []).filter(Boolean);
       const lh = f * 1.15, y0 = -((lines.length - 1) * lh) / 2 + f * 0.35;
       out.push(`<text class="${cls}" text-anchor="middle">${lines.map((t, k) => `<tspan x="0" y="${(y0 + k * lh).toFixed(2)}" font-size="${((k === 2 ? 0.85 : 1) * f).toFixed(2)}"${k === 0 ? ' class="b"' : ""}>${esc(t)}</tspan>`).join("")}</text>`);
       continue;
@@ -738,7 +740,7 @@ function fanLabels() {
     if (Math.max(tang, radLen) < 14 || Math.max(thick, radThick) < fpx) continue;
     const useT = tang >= radLen * 0.9 && thick >= fpx * 1.1;
     const len = useT ? tang : radLen, nl = Math.max(1, Math.min(3, Math.floor((useT ? thick : radThick) / (fpx * 1.12))));
-    const opts = [[given, sur, y], [given, sur], [given + " " + ini], [given], [given[0] + "." + (ini ? " " + ini : "")]];
+    const opts = [...both, [given, sur, y], [given, sur], [given + " " + ini], [given], [given[0] + "." + (ini ? " " + ini : "")]];
     const pick = opts.find(o => o.length <= nl && o.filter(Boolean).every((t, k) => t.length * (k === 2 ? fpx * 0.85 : fpx) * TW <= len));
     if (!pick) continue;
     const L = pick.filter(Boolean), mid = (sg.a0 + sg.a1) / 2, deg = ((mid * 180 / Math.PI) % 360 + 360) % 360;
@@ -750,7 +752,7 @@ function fanLabels() {
 }
 
 // ---------- tree: boxes and lines; parents above, children below, siblings beside, branches fold and unfold
-const BW = 132, BH = 64, HG = 14, SG = 8, RH = 110, CW = 32, CHH = 22;
+const BW = 132, BH = 78, HG = 14, SG = 8, RH = 124, CW = 32, CHH = 22;
 const newShape = () => ({ nodes: [], lines: [], chips: [], cont: new Map(), anchor: 0 });
 function ext(S, row, l, r) { const c = S.cont.get(row); if (!c) S.cont.set(row, [l, r]); else { c[0] = Math.min(c[0], l); c[1] = Math.max(c[1], r); } }
 function box(S, id, x, row, extra = {}) { S.nodes.push({ id, x, row, ...extra }); ext(S, row, x, x + BW); }
@@ -885,7 +887,7 @@ function treeModel(c) {
   return { kind: "tree", focus: c, items, lines: S.lines, chips: S.chips };
 }
 const cut = (t, n) => t.length <= n ? t : t.slice(0, n - 1) + ".";
-const nameLines = id => { const g = P[id].g || "N.N.", s = P[id].s || ""; return [cut(g.length <= 15 ? g : first(id) || "N.N.", 15), cut(s, 15)]; };
+const nameLines = id => { const g = P[id].g || "N.N.", s = P[id].s || "", m = P[id].m; return [cut(g.length <= 15 ? g : first(id) || "N.N.", 15), cut(m || s, 15), m && s ? cut("z d. " + s, 21) : ""]; };
 function chipLabel(ch) {
   const nm = full(ch.id);
   if (ch.kind === "sib") return [ch.open ? "−" : "+" + ch.n, ch.open ? `Ukryj rodzeństwo: ${nm}` : `Pokaż rodzeństwo: ${nm} (${ch.n})`];
@@ -913,7 +915,8 @@ function draw(animate) {
       const y = n.row * RH, nm = nameLines(n.id);
       return `<g class="node tnode${n.line ? " line" : ""}${n.half ? " half" : ""}${n.id === centre ? " centre" : ""}" data-i="${n.i}" role="button" tabindex="${n.i === focusIdx ? 0 : -1}" aria-label="${esc(itemLabel(n))}" transform="translate(${n.x.toFixed(1)},${y})">
         <rect class="box" width="${BW}" height="${BH}" rx="8"/><rect class="stripe f-${stOf(n.id)}" width="7" height="${BH}" rx="3"/>
-        <text class="tn" x="14" y="20">${esc(nm[0])}</text><text class="tn" x="14" y="37">${esc(nm[1])}</text><text class="ty" x="14" y="54">${esc(chartYrs(n.id))}</text></g>`;
+        ${nm[2] ? `<text class="tn" x="14" y="20">${esc(nm[0])}</text><text class="tn" x="14" y="37">${esc(nm[1])}</text><text class="tm" x="14" y="52">${esc(nm[2])}</text><text class="ty" x="14" y="68">${esc(chartYrs(n.id))}</text>`
+          : `<text class="tn" x="14" y="27">${esc(nm[0])}</text><text class="tn" x="14" y="44">${esc(nm[1])}</text><text class="ty" x="14" y="61">${esc(chartYrs(n.id))}</text>`}</g>`;
     }).join("") + M.chips.map(ch => {
       const [t, a] = chipLabel(ch);
       return `<g class="chip" data-c="${ch.k}" role="button" tabindex="0" aria-label="${esc(a)}" aria-expanded="${ch.open}" transform="translate(${(ch.x - CW / 2).toFixed(1)},${ch.y - CHH / 2})"><title>${esc(a)}</title><rect width="${CW}" height="${CHH}" rx="12"/><text x="${CW / 2}" y="15.5" text-anchor="middle">${esc(t)}</text></g>`;

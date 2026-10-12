@@ -144,6 +144,7 @@ main { min-height: 0; position: relative; }
 .tnode.sel .box { stroke: var(--stamp); stroke-width: 4; }
 .tnode:focus-visible .box { stroke: var(--stamp); stroke-width: 4; stroke-dasharray: 6 3; }
 .tn { font-family: var(--font-body); font-weight: 700; font-size: 14px; fill: var(--ink); pointer-events: none; }
+.tm { font-family: var(--font-body); font-size: 12px; fill: var(--ink-soft); pointer-events: none; }
 .ty { font-family: var(--font-body); font-size: 12.5px; fill: var(--ink-soft); pointer-events: none; font-variant-numeric: tabular-nums; }
 .chip { cursor: pointer; outline: none; }
 .chip rect { fill: var(--paper); stroke: var(--stamp); stroke-width: 1.4; }
@@ -648,7 +649,7 @@ const docsOf = id => uniq([...(P[id].ev || []), ...Object.keys(D.ev).filter(k =>
 // ---------- side panel
 const word = st => `<span class="word ${st}">${WORD[st] || st}</span>`;
 function pbtn(id, extra) {
-  return `<li><a class="pl" href="#/osoba/${encodeURIComponent(id)}"><span class="sw f-${stOf(id)}" aria-hidden="true"></span><span class="nm">${esc(full(id))}</span>${yrs(id) ? `<span class="yr">${esc(yrs(id))}</span>` : ""}${extra ? `<span class="ex">${esc(extra)}</span>` : ""}</a></li>`;
+  return `<li><a class="pl" href="#/osoba/${encodeURIComponent(id)}"><span class="sw f-${stOf(id)}" aria-hidden="true"></span><span class="nm">${esc(full(id))}${P[id].m ? ` (${esc(P[id].m)})` : ""}</span>${yrs(id) ? `<span class="yr">${esc(yrs(id))}</span>` : ""}${extra ? `<span class="ex">${esc(extra)}</span>` : ""}</a></li>`;
 }
 function thumb(k) {
   const e = D.ev[k];
@@ -1031,7 +1032,7 @@ const placeNow = id => { const s = stateAt(id, t); return s ? s : null; };
 function tipFor(id, x, y) {
   const s = placeNow(id), st = s && TR[id].st[s.i];
   const where = !s ? "" : s.to ? `w drodze: ${short(s.p)} → ${short(s.to)}` : s.mode === "stale" || s.mode === "dead" ? `ostatnio w aktach: ${short(st.p)}, ${Math.floor(st.y)}` : `${short(st.p)}, od ${Math.floor(st.y)} (${KINDN[st.k]})`;
-  tip.innerHTML = `<b>${esc(full(id))}</b> <span>${esc(yrs(id))}</span>${where ? `<br><span>${esc(where)}</span>` : ""}${relLine(id) ? `<br><span>${esc(relLine(id))}</span>` : ""}`;
+  tip.innerHTML = `<b>${esc(full(id))}</b> <span>${esc(yrs(id))}</span>${alt(id) ? `<br><span>${esc(alt(id))}</span>` : ""}${where ? `<br><span>${esc(where)}</span>` : ""}${relLine(id) ? `<br><span>${esc(relLine(id))}</span>` : ""}`;
   tip.hidden = false;
   const st0 = $("#stage").getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
   tip.style.left = Math.max(6, Math.min(st0.width - w - 6, x - w / 2)) + "px";

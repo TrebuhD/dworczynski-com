@@ -138,6 +138,9 @@ main { min-height: 0; position: relative; }
 .tnode .stripe { stroke: none; }
 .tnode.line .box { stroke: var(--ink); stroke-width: 1.4; }
 .tnode.half .box { stroke-dasharray: 5 3; }
+.tnode.poss .box { fill: color-mix(in srgb, var(--leaf) 60%, var(--paper)); }
+.tnode.poss .tn { fill: var(--ink-soft); }
+.tq { font-family: var(--font-body); font-size: 20px; font-weight: 700; fill: var(--s-likely); pointer-events: none; }
 .tnode.centre .box { fill: color-mix(in srgb, var(--stamp) 14%, var(--leaf)); stroke: var(--stamp); stroke-width: 2.5; }
 .tnode:hover .box { stroke: var(--stamp); }
 .tnode.sel .box { stroke: var(--stamp); stroke-width: 4; }
@@ -419,7 +422,7 @@ const full = id => P[id] ? [P[id].g || "N.N.", P[id].s].filter(Boolean).join(" "
 const dbl = id => P[id].m && P[id].s && P[id].m.includes(P[id].s);  // double-barrelled, e.g. Klunder-Dworczyńska
 const alt = id => { const p = P[id]; return p.m ? (p.x === "F" ? "po mężu " : "także ") + p.m : ""; };
 const yrs = id => P[id].y || "";
-const stOf = id => P[id].lv ? "living" : P[id].st;
+const stOf = id => P[id].st === "possible" ? "possible" : P[id].lv ? "living" : P[id].st;  // "possible" must stay visible on living people too
 
 // ---------- relationships, from one person's point of view ("Twój pradziadek"), shown as "Dla Huberta: pradziadek"
 const ROOT = D.root, START = D.start || D.root;
@@ -926,8 +929,8 @@ function draw(animate) {
     const ln = M.lines.map(l => `M${l[0].toFixed(1)},${l[1]}L${l[2].toFixed(1)},${l[3]}`).join("");
     g.innerHTML = `<path class="tline" d="${ln}"/>` + M.items.map(n => {
       const y = n.row * RH, nm = nameLines(n.id);
-      return `<g class="node tnode${n.line ? " line" : ""}${n.half ? " half" : ""}${n.id === centre ? " centre" : ""}" data-i="${n.i}" role="button" tabindex="${n.i === focusIdx ? 0 : -1}" aria-label="${esc(itemLabel(n))}" transform="translate(${n.x.toFixed(1)},${y})">
-        <rect class="box" width="${BW}" height="${BH}" rx="8"/><rect class="stripe f-${stOf(n.id)}" width="7" height="${BH}" rx="3"/>${P[n.id].rq ? `<circle class="rqdot" cx="${BW - 11}" cy="11" r="4.5"/>` : ""}
+      return `<g class="node tnode${n.line ? " line" : ""}${P[n.id].st === "possible" ? " poss" : ""}${n.half ? " half" : ""}${n.id === centre ? " centre" : ""}" data-i="${n.i}" role="button" tabindex="${n.i === focusIdx ? 0 : -1}" aria-label="${esc(itemLabel(n))}" transform="translate(${n.x.toFixed(1)},${y})">
+        <rect class="box" width="${BW}" height="${BH}" rx="8"/><rect class="stripe f-${stOf(n.id)}" width="7" height="${BH}" rx="3"/>${P[n.id].st === "possible" ? `<text class="tq" x="${BW - 10}" y="${BH - 10}" text-anchor="middle">?</text>` : ""}${P[n.id].rq ? `<circle class="rqdot" cx="${BW - 11}" cy="11" r="4.5"/>` : ""}
         ${nm[2] ? `<text class="tn" x="14" y="20">${esc(nm[0])}</text><text class="tn" x="14" y="37">${esc(nm[1])}</text><text class="${nm[3] ? "tn" : "tm"}" x="14" y="${nm[3] ? 54 : 52}">${esc(nm[2])}</text><text class="ty" x="14" y="68">${esc(chartYrs(n.id))}</text>`
           : `<text class="tn" x="14" y="27">${esc(nm[0])}</text><text class="tn" x="14" y="44">${esc(nm[1])}</text><text class="ty" x="14" y="61">${esc(chartYrs(n.id))}</text>`}</g>`;
     }).join("") + M.chips.map(ch => {
@@ -937,7 +940,7 @@ function draw(animate) {
     $("#labels").innerHTML = "";
   }
   $("#hint").textContent = M.kind === "fan" ? "Kliknij osobę, żeby o niej przeczytać. Kliknij dwa razy, żeby ustawić ją w środku. Przeciągnij, żeby przesunąć; kółko myszy przybliża."
-    : "Kliknij osobę, żeby o niej przeczytać; dwa razy, żeby ustawić ją w środku. Przyciski +: nad osobą rodzice, obok rodzeństwo, pod spodem dzieci. Przerywana ramka: rodzeństwo przyrodnie.";
+    : "Kliknij osobę, żeby o niej przeczytać; dwa razy, żeby ustawić ją w środku. Przyciski +: nad osobą rodzice, obok rodzeństwo, pod spodem dzieci. Przerywana ramka: rodzeństwo przyrodnie. Znak zapytania: możliwy krewny, bez potwierdzenia.";
   const n = M.items.filter(s => s.id).length;
   svg().setAttribute("aria-label", `${view === "fan" ? "Wachlarz" : "Drzewo"}: w środku ${full(M.focus)}, osób na wykresie: ${n}. Strzałki przechodzą między osobami, Enter pokazuje szczegóły, dwukrotne kliknięcie ustawia osobę w środku.`);
   markSel();
